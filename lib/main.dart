@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:qna_frontend/screens/splash.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // 꼭 필요
-  await Firebase.initializeApp(); // Firebase 초기화
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(QAApp());
 }
 
