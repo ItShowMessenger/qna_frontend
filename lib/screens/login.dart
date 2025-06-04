@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'home.dart';
+
 class Login extends StatelessWidget {
   final TextEditingController idController = TextEditingController();
   final TextEditingController pwController = TextEditingController();
@@ -16,18 +18,21 @@ class Login extends StatelessWidget {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) return;
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth = await googleUser
+          .authentication;
 
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      final UserCredential userCredential = await _auth.signInWithCredential(
+          credential);
       final User? user = userCredential.user;
 
       if (user == null || user.email == null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('로그인 실패')));
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('로그인 실패')));
         return;
       }
 
@@ -49,18 +54,63 @@ class Login extends StatelessWidget {
         Uri.parse('http://172.30.1.94:8088/api/login'), // 실제 서버 주소로 교체
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer idToken',
-        }
+          'Authorization': 'Bearer ${googleAuth.idToken}',
+        },
+        body: jsonEncode({
+          'token': googleAuth.idToken,
+        }),
       );
 
       if (response.statusCode == 200) {
-        print('서버 로그인 성공');
-        // TODO: 로그인 성공 후 다음 페이지로 이동
-      } else {
-        print('서버 오류: ${response.body}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('서버 오류: ${response.statusCode}')),
-        );
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['success'] == true) {
+          final user = jsonResponse['data'];
+          final userid = user['userid'];
+          final name = user['name'];
+          final email = user['email'];
+          final userType = user['usertype'];
+
+          await showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('알림 수신 동의'),
+                content: Text('Q&A 앱 내 채팅 관련 알림을 수신하시겠습니까?'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // 팝업 닫기
+                      // ✅ 동의한 경우 처리 (예: 알림 설정 저장)
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Home()),
+                      );
+                    },
+                    child: Text('동의'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      // ✅ 비동의한 경우에도 페이지 이동
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Home()),
+                      );
+                    },
+                    child: Text('비동의'),
+                  ),
+                ],
+              );
+            },
+          );
+          Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Home()),);
+        } else {
+          print('서버 오류: ${response.body}');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('서버 오류: ${response.statusCode}')),
+          );
+        }
       }
     } catch (e) {
       print('로그인 오류: $e');
