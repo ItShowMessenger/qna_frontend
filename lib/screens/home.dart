@@ -122,8 +122,8 @@ class Home extends StatelessWidget {
             ),
           ),
 
-          Positioned(
-            top: 230, // 채팅 항목 아래에 위치 (높이 조정 가능)
+          Positioned( // 채팅방 추가 버튼
+            top: 230,
             left: 0,
             right: 0,
             child: Center(

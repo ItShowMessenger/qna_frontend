@@ -75,6 +75,7 @@ flutter:
     - assets/btns/optAct.png
     - assets/icons/icon_search.png
     - assets/icons/icon_plusChat.png
+    - assets/icons/icon_back.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
