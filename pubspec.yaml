@@ -1,5 +1,5 @@
 name: qna_frontend
-description: "A new Flutter project."
+description: "it show qna fend."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -30,7 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_sign_in: ^6.0.0  # 로그인 dependencies
+  google_sign_in: ^6.0.0
   firebase_auth: ^4.0.0
   firebase_core: ^2.0.0
 
@@ -63,6 +63,18 @@ flutter:
   assets:
     - assets/images/Q&A.png
     - assets/images/google_logo.png
+    - assets/images/topNav.png
+    - assets/images/def_photo.png
+    - assets/btns/mypgDis.png
+    - assets/btns/mypgAct.png
+    - assets/btns/chatDis.png
+    - assets/btns/chatAct.png
+    - assets/btns/calDis.png
+    - assets/btns/calAct.png
+    - assets/btns/optDis.png
+    - assets/btns/optAct.png
+    - assets/icons/icon_search.png
+    - assets/icons/icon_plusChat.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -35,7 +35,6 @@ class Login extends StatelessWidget {
       final name = user.displayName ?? '';
       final uid = user.uid;
 
-      // 도메인 검사
       if (!email.endsWith('@e-mirim.hs.kr')) {
         await _googleSignIn.signOut();
         await _auth.signOut();
@@ -45,15 +44,13 @@ class Login extends StatelessWidget {
         return;
       }
 
-      // 서버로 POST 요청 보내기
+      //요청 /api/login
       final response = await http.post(
-        Uri.parse('http://<YOUR_BACKEND_IP>:8080/api/login'), // 실제 서버 주소로 교체
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'id': uid,
-          'name': name,
-          'email': email,
-        }),
+        Uri.parse('http://172.30.1.94:8088/api/login'), // 실제 서버 주소로 교체
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer idToken',
+        }
       );
 
       if (response.statusCode == 200) {
