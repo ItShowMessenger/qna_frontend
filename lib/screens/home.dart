@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:qna_frontend/screens/home_input.dart';
 
 class Home extends StatelessWidget {
   @override
@@ -129,8 +130,11 @@ class Home extends StatelessWidget {
             child: Center(
               child: IconButton(
                 onPressed: () {
-                  // TODO: 채팅방 추가 기능 구현하세요^^ Insert 와~
-                },
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Home_input()),
+                  );
+                  },
                 icon: Image.asset('assets/icons/icon_plusChat.png', width: 50, height: 50,)
               ),
             ),

@@ -30,6 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  intl: ^0.18.1
   google_sign_in: ^6.0.0
   firebase_auth: ^4.0.0
   firebase_core: ^2.0.0
@@ -76,6 +77,8 @@ flutter:
     - assets/icons/icon_search.png
     - assets/icons/icon_plusChat.png
     - assets/icons/icon_back.png
+    - assets/icons/icon_plusFile.png
+    - assets/icons/icon_input.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

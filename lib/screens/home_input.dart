@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'home.dart';
+
 class Home_input extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -29,7 +31,12 @@ class Home_input extends StatelessWidget {
                 children: [
                   IconButton(
                     icon: Image.asset('assets/icons/icon_back.png', width: 40, height: 40,),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Home()),
+                      );
+                    },
                   ),
                   Expanded(
                     child: Center(
