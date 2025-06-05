@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'home.dart';
 
 class Chat extends StatefulWidget {
@@ -8,16 +6,50 @@ class Chat extends StatefulWidget {
   _ChatState createState() => _ChatState();
 }
 
-class _ChatState extends State<Chat> {
-  final TextEditingController _controller = TextEditingController();
-  String _chatText = '';
-  DateTime _sendTime = DateTime.now();
+class ChatMessage {
+  final String text;
+  final DateTime time;
+  final bool isMe;
+  final bool isRead;
 
-  void _sendMessage() {
+  ChatMessage({
+    required this.text,
+    required this.time,
+    required this.isMe,
+    required this.isRead,
+  });
+}
+
+class _ChatState extends State<Chat> {
+  final TextEditingController _myController = TextEditingController();
+  final TextEditingController _otherController = TextEditingController();
+  final List<ChatMessage> _messages = [];
+  final ScrollController _scrollController = ScrollController();
+
+  void _sendMessage({required bool isMe}) {
+    final controller = isMe ? _myController : _otherController;
+    final text = controller.text.trim();
+    if (text.isEmpty) return;
+
     setState(() {
-      _chatText = _controller.text.trim();
-      _sendTime = DateTime.now(); // 보낸 시간 저장
-      _controller.clear();
+      _messages.add(ChatMessage(
+        text: text,
+        time: DateTime.now(),
+        isMe: isMe,
+        isRead: !isMe,
+      ));
+      controller.clear();
+    });
+
+    // 자동 스크롤
+    Future.delayed(Duration(milliseconds: 100), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
     });
   }
 
@@ -26,8 +58,6 @@ class _ChatState extends State<Chat> {
     final DateTime now = DateTime.now();
     final String todayDate =
         '${now.year % 100}.${now.month.toString().padLeft(2, '0')}.${now.day.toString().padLeft(2, '0')}';
-    final String time =
-        '${_sendTime.hour.toString().padLeft(2, '0')}:${_sendTime.minute.toString().padLeft(2, '0')}';
 
     return Scaffold(
       body: Stack(
@@ -52,7 +82,6 @@ class _ChatState extends State<Chat> {
               color: Color(0xFF566B92),
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
                     icon: Image.asset(
@@ -71,10 +100,7 @@ class _ChatState extends State<Chat> {
                     child: Center(
                       child: Text(
                         '6학년 6반 미림선생님',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                        ),
+                        style: TextStyle(color: Colors.white, fontSize: 18),
                       ),
                     ),
                   ),
@@ -84,7 +110,7 @@ class _ChatState extends State<Chat> {
             ),
           ),
 
-          // 날짜 표시
+          // 날짜
           Positioned(
             top: 150,
             left: 0,
@@ -92,68 +118,147 @@ class _ChatState extends State<Chat> {
             child: Center(
               child: Text(
                 todayDate,
-                style: TextStyle(
-                  color: Color(0xFF8D8D8D),
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: Color(0xFF8D8D8D), fontSize: 14),
               ),
             ),
           ),
 
-          // 채팅 말풍선
+          // 메시지 리스트
           Positioned(
-            top: 210,
-            left: 16,
-            right: 16,
-            child: _chatText.isNotEmpty
-                ? Align(
-              alignment: Alignment.centerRight,
-              child: Container(
-                padding: EdgeInsets.all(12),
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.7,
-                ),
-                decoration: BoxDecoration(
-                  color: Color(0xFF566B92),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      _chatText,
-                      style:
-                      TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                    SizedBox(height: 6),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
+            top: 180,
+            left: 0,
+            right: 0,
+            bottom: 150,
+            child: ListView.builder(
+              controller: _scrollController,
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              itemCount: _messages.length,
+              itemBuilder: (context, index) {
+                final msg = _messages[index];
+                final time =
+                    '${msg.time.hour.toString().padLeft(2, '0')}:${msg.time.minute.toString().padLeft(2, '0')}';
+
+                return Align(
+                  alignment: msg.isMe ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Container(
+                    margin: EdgeInsets.symmetric(vertical: 6),
+                    child: Column(
+                      crossAxisAlignment:
+                      msg.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          time,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white70,
-                          ),
-                        ),
-                        SizedBox(width: 6),
-                        Text(
-                          '확인됨', // 또는 '확인안됨'
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white70,
-                          ),
+                        Row(
+                          mainAxisAlignment: msg.isMe
+                              ? MainAxisAlignment.end
+                              : MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            if (!msg.isMe) ...[
+                              Container(
+                                padding: EdgeInsets.all(12),
+                                constraints: BoxConstraints(
+                                  maxWidth:
+                                  MediaQuery.of(context).size.width * 0.7,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(color: Color(0xFFCCCCCC)),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  msg.text,
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                            ],
+                            if (msg.isMe)
+                              SizedBox(width: 8),
+                            Column(
+                              crossAxisAlignment: msg.isMe
+                                  ? CrossAxisAlignment.end
+                                  : CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  time,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black45,
+                                  ),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  msg.isRead ? '확인됨' : '확인안됨',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black45,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (msg.isMe) ...[
+                              SizedBox(width: 8),
+                              Container(
+                                padding: EdgeInsets.all(12),
+                                constraints: BoxConstraints(
+                                  maxWidth:
+                                  MediaQuery.of(context).size.width * 0.7,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFF566B92),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  msg.text,
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 16),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ],
-                    )
-                  ],
-                ),
-              ),
-            )
-                : Container(),
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
 
-          // 하단 입력창
+          // 하단 입력창 2개
+          Positioned(
+            bottom: 70,
+            left: 0,
+            right: 0,
+            child: Container(
+              color: Colors.grey[100],
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _otherController,
+                      decoration: InputDecoration(
+                        hintText: '상대방 메시지 입력',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  IconButton(
+                    icon: Icon(Icons.send, color: Colors.blue),
+                    onPressed: () => _sendMessage(isMe: false),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
           Positioned(
             bottom: 0,
             left: 0,
@@ -163,7 +268,6 @@ class _ChatState extends State<Chat> {
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Row(
                 children: [
-                  // 앞쪽 버튼 (예: 추가 버튼)
                   IconButton(
                     icon: Image.asset(
                       'assets/icons/icon_plusFile.png',
@@ -171,36 +275,32 @@ class _ChatState extends State<Chat> {
                       height: 28,
                     ),
                     onPressed: () {
-                      // 추가 기능 구현
+                      // 파일 추가 기능
                     },
                   ),
                   SizedBox(width: 4),
-
-                  // 입력창
                   Expanded(
                     child: TextField(
-                      controller: _controller,
-                      minLines: 1,
-                      maxLines: 5,
+                      controller: _myController,
                       decoration: InputDecoration(
-                        hintText: '메시지를 입력하세요',
+                        hintText: '내 메시지 입력',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
                         contentPadding: EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 12),
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
                       ),
                     ),
                   ),
-
-                  // 전송 버튼 (이미지 사용)
                   IconButton(
                     icon: Image.asset(
                       'assets/icons/icon_input.png',
                       width: 28,
                       height: 28,
                     ),
-                    onPressed: _sendMessage,
+                    onPressed: () => _sendMessage(isMe: true),
                   ),
                 ],
               ),
@@ -211,3 +311,4 @@ class _ChatState extends State<Chat> {
     );
   }
 }
+

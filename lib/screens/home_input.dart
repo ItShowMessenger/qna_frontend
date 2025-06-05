@@ -61,7 +61,7 @@ class Home_input extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SizedBox(height: 30), // 상단 여백 조절 (네비 영역 피하기 위해)
+                  SizedBox(height: 10), // 상단 여백 조절 (네비 영역 피하기 위해)
                   Text(
                     '선생님에게 받은 코드를 입력해주세요.',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
