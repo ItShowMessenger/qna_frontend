@@ -1,9 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:qna_frontend/screens/option_stu.dart';
-import 'package:qna_frontend/screens/option_t.dart';
+import 'package:qna_frontend/screens/home_input.dart';
 
-import 'calendar.dart';
 import 'chat.dart';
 
 class Home extends StatelessWidget {
@@ -23,13 +21,12 @@ class Home extends StatelessWidget {
             ),
           ),
           Positioned( //채팅 + 검색 아이콘
-            top: 40,
+            top: 42,
             left: 0,
             right: 0,
             child: Container(
-              height: 50,
-              color: Color(0xFF3C72BD), // #566B92 배경
-              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 0),
+              color: Color(0xFF566B92), // #566B92 배경
+              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -43,21 +40,11 @@ class Home extends StatelessWidget {
                   Image.asset(
                     'assets/icons/icon_search.png', // 또는 Image.asset('assets/icon.png')
                     color: Colors.white,
-                    width: 30,
-                    height: 30,
+                    width: 40,
+                    height: 40,
                   ),
                 ],
               ),
-            ),
-          ),
-          Positioned(
-            top: 80,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 20,
-              color: Color(0xFF3C72BD),
-              padding: EdgeInsets.fromLTRB(25, 8, 25, 0),
             ),
           ),
           Positioned( // 채팅방 항목
@@ -125,7 +112,7 @@ class Home extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: Color(0xFF3C72BD),
+                            color: Color(0xFF566B92),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -146,13 +133,30 @@ class Home extends StatelessWidget {
             ),
           ),
 
+          Positioned( // 채팅방 추가 버튼
+            top: 230,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Home_input()),
+                  );
+                  },
+                icon: Image.asset('assets/icons/icon_plusChat.png', width: 50, height: 50,)
+              ),
+            ),
+          ),
+
 
           Positioned( // 하단 탭 바
             bottom: 0,
             left: 0,
             right: 0,
             child: Container(
-              color: Color(0xFF3C72BD),
+              color: Color(0xFF566B92),
               padding: EdgeInsets.symmetric(vertical: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -167,19 +171,11 @@ class Home extends StatelessWidget {
                   ),
                   IconButton(
                     icon: Image.asset('assets/btns/calDis.png', width: 40, height: 40,),
-                    onPressed: () {
-                      Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Calendar()),
-                    );
-                      },
+                    onPressed: () {},
                   ),
                   IconButton(
                     icon: Image.asset('assets/btns/optDis.png', width: 40, height: 40,),
-                    onPressed: () {Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Option_t()),
-                    );},
+                    onPressed: () {},
                   ),
                 ],
               ),
