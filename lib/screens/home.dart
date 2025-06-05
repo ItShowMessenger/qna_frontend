@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qna_frontend/screens/home_input.dart';
 
+import 'chat.dart';
+
 class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -45,80 +47,88 @@ class Home extends StatelessWidget {
               ),
             ),
           ),
-          Positioned( //채팅방 항목
+          Positioned( // 채팅방 항목
             top: 140,
             left: 0,
             right: 0,
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 16),
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(6),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
-                  )
-                ],
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 프로필 이미지
-                  Container(
-                    width: 48,
-                    height: 48,
-                    margin: EdgeInsets.only(right: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      shape: BoxShape.circle,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Chat()),
+                );
+              },
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(6),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    )
+                  ],
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 프로필 이미지
+                    Container(
+                      width: 48,
+                      height: 48,
+                      margin: EdgeInsets.only(right: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        shape: BoxShape.circle,
+                      ),
+                      child: Image.asset('assets/images/def_photo.png'),
                     ),
-                    child: Image.asset('assets/images/def_photo.png'),
-                  ),
 
-                  // 이름과 메시지
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    // 이름과 메시지
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '선생님 이름',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            '최신 메시지 내용',
+                            style: TextStyle(color: Colors.grey[900]),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // 안읽은 메시지 수 + 시간
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                          '선생님 이름',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18,),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Color(0xFF566B92),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '1',
+                            style: TextStyle(color: Colors.white, fontSize: 12),
+                          ),
                         ),
-                        SizedBox(height: 4),
+                        SizedBox(height: 10),
                         Text(
-                          '최신 메시지 내용',
-                          style: TextStyle(color: Colors.grey[900]),
+                          '1시간 전',
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
-                  ),
-
-                  // 안읽은 메시지 수 + 시간
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Color(0xFF566B92),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '1',
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        '1시간 전',
-                        style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
