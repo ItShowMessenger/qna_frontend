@@ -7,6 +7,8 @@ import 'package:qna_frontend/screens/option_stu.dart';
 import 'calendar.dart';
 import 'chat.dart';
 
+import 'chat.dart';
+
 class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
