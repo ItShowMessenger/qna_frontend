@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'home.dart';
+import 'option.dart';
 
 class Calendar extends StatefulWidget {
   @override
@@ -63,12 +64,12 @@ class _CalendarState extends State<Calendar> {
 
           // 타이틀 바
           Positioned(
-            top: 40,
+            top: 46,
             left: 0,
             right: 0,
             child: Container(
               height: 60,
-              color: Color(0xFF3C72BD),
+              color: Color(0xFF566B92),
               padding: EdgeInsets.fromLTRB(25, 8, 25, 0),
               child: Align(
                 alignment: Alignment.topLeft,
@@ -162,7 +163,7 @@ class _CalendarState extends State<Calendar> {
             left: 0,
             right: 0,
             child: Container(
-              color: Color(0xFF3C72BD),
+              color: Color(0xFF566B92),
               padding: EdgeInsets.symmetric(vertical: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -189,7 +190,7 @@ class _CalendarState extends State<Calendar> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Home()),
+                        MaterialPageRoute(builder: (context) => Option()),
                       );
                     },
                   ),
