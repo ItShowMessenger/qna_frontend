@@ -24,7 +24,6 @@ class Login extends StatelessWidget {
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      print(googleAuth.idToken);
 
       final UserCredential userCredential = await _auth.signInWithCredential(credential);
       final User? user = userCredential.user;
@@ -34,25 +33,19 @@ class Login extends StatelessWidget {
         return;
       }
 
+      // /api/login 요청
       final response = await http.post(
         Uri.parse('http://172.30.1.94:8088/api/login'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ${googleAuth.idToken}',
         },
-        body: jsonEncode({}),
       );
-
-      print('응답 status code: ${response.statusCode}');
-      print('응답 body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        print('에레레레레 $jsonResponse');
         final success = jsonResponse['success'] ?? false;
-        if (jsonResponse['data'] is Map<String, dynamic>) {
-          final Map<String, dynamic> userData = jsonResponse['data'];
-        }
+
         if (!success) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('로그인 실패')));
           return;
@@ -61,6 +54,7 @@ class Login extends StatelessWidget {
         final userType = jsonResponse['data']['userType'];
         final isNewUser = jsonResponse['data']['isNewUser'] ?? false;
 
+        // 신규 교사 → 교무실 위치, 담당과목 입력 팝업
         if (userType == "TEACHER" && isNewUser) {
           await showDialog(
             context: context,
@@ -101,16 +95,19 @@ class Login extends StatelessWidget {
             },
           );
         } else {
+          // 학생 또는 기존 선생님
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => Home()),
           );
         }
       } else if (response.statusCode == 403) {
+        // 학교 이메일 아님
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('학교 이메일이 아닙니다. 다른 계정으로 로그인해주세요.')),
         );
-        await _googleSignIn.signOut();
+
+        await _googleSignIn.signOut(); // 현재 계정 로그아웃
       } else if (response.statusCode == 401) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('인증 실패: 유효하지 않은 토큰')),
@@ -121,7 +118,7 @@ class Login extends StatelessWidget {
         );
       }
     } catch (e) {
-      print('또 실패구나~: $e');
+      print('로그인 오류: $e');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('에엑따')));
     }
   }
@@ -129,6 +126,7 @@ class Login extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      //backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Center(
@@ -139,8 +137,8 @@ class Login extends StatelessWidget {
                 'assets/images/Q&A.png',
                 width: 145,
                 fit: BoxFit.contain,
-              ),
-              SizedBox(height: 40),
+              ), SizedBox(height: 40),
+
               Text(
                 '학교 이메일로 로그인해주세요.',
                 style: TextStyle(
@@ -148,6 +146,7 @@ class Login extends StatelessWidget {
                   color: Colors.black45,
                 ),
               ),
+
               SizedBox(height: 25),
               OutlinedButton.icon(
                 onPressed: () => _handleGoogleLogin(context),

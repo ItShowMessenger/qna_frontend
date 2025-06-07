@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qna_frontend/screens/home_input.dart';
+import 'package:qna_frontend/screens/option.dart';
 
+import 'calendar.dart';
 import 'chat.dart';
 
 class Home extends StatelessWidget {
@@ -21,7 +23,7 @@ class Home extends StatelessWidget {
             ),
           ),
           Positioned( //채팅 + 검색 아이콘
-            top: 42,
+            top: 40,
             left: 0,
             right: 0,
             child: Container(
@@ -171,11 +173,19 @@ class Home extends StatelessWidget {
                   ),
                   IconButton(
                     icon: Image.asset('assets/btns/calDis.png', width: 40, height: 40,),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Calendar()),
+                    );
+                      },
                   ),
                   IconButton(
                     icon: Image.asset('assets/btns/optDis.png', width: 40, height: 40,),
-                    onPressed: () {},
+                    onPressed: () {Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Option()),
+                    );},
                   ),
                 ],
               ),
