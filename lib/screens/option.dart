@@ -1,104 +1,87 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:qna_frontend/models/dto.dart'; // dto.dart 경로에 맞게 수정
+import 'package:qna_frontend/screens/calendar.dart';
+import 'package:qna_frontend/screens/home_input.dart';
 
-class OptionScreen extends StatelessWidget {
-  final UserDto user;
+import 'chat.dart';
+import 'home.dart';
 
-  const OptionScreen({super.key, required this.user});
-
+class Option extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('설정')),
-      body: ListView(
+      //backgroundColor: Colors.white,
+      body: Stack( //네비게이션 바
         children: [
-          const SizedBox(height: 20),
+        Positioned(
+        top: 0,
+        left: 0,
+        right: 0,
+        child: Image.asset(
+          'assets/images/topNav.png',
+          fit: BoxFit.cover,
+            ),
+          ),
+          Positioned( //옵션
+            top: 46,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 60,
+              color: Color(0xFF566B92),
+              padding: EdgeInsets.fromLTRB(25, 8, 25, 0),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: Text(
+                  '옵션',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 23,
+                  ),
+                ),
+              ),
+            ),
+          ),
 
-          // 공통 옵션
-          const CommonOption(),
 
-          const Divider(),
-
-          // 학생/선생님에 따라 다른 UI 표시
-          if (user.usertype == UserType.student) ...[
-            const StudentOption(),
-          ] else if (user.usertype == UserType.teacher) ...[
-            const TeacherOption(),
-          ],
+          Positioned( // 하단 탭 바
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              color: Color(0xFF566B92),
+              padding: EdgeInsets.symmetric(vertical: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  IconButton(
+                    icon: Image.asset('assets/btns/mypgDis.png', width: 40, height: 40,),
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    icon: Image.asset('assets/btns/chatDis.png', width: 40, height: 40,),
+                    onPressed: () {Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Home()),
+                    );},
+                  ),
+                  IconButton(
+                    icon: Image.asset('assets/btns/calDis.png', width: 40, height: 40,),
+                    onPressed: () {Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Calendar()),
+                    );},
+                  ),
+                  IconButton(
+                    icon: Image.asset('assets/btns/optAct.png', width: 40, height: 40,),
+                    onPressed: () {},
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
-    );
-  }
-}
-
-// ───── 공통 옵션 위젯 ──────────────────────────────
-class CommonOption extends StatelessWidget {
-  const CommonOption({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: const [
-        ListTile(
-          leading: Icon(Icons.notifications),
-          title: Text('알림 설정'),
-          subtitle: Text('채팅 및 일정 알림을 관리합니다'),
-        ),
-        ListTile(
-          leading: Icon(Icons.privacy_tip),
-          title: Text('개인정보 처리방침'),
-        ),
-        ListTile(
-          leading: Icon(Icons.logout),
-          title: Text('로그아웃'),
-        ),
-      ],
-    );
-  }
-}
-
-// ───── 학생 전용 옵션 ─────────────────────────────
-class StudentOption extends StatelessWidget {
-  const StudentOption({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: const [
-        ListTile(
-          leading: Icon(Icons.book),
-          title: Text('수강 중인 과목'),
-        ),
-        ListTile(
-          leading: Icon(Icons.schedule),
-          title: Text('내 일정'),
-        ),
-      ],
-    );
-  }
-}
-
-// ───── 선생님 전용 옵션 ───────────────────────────
-class TeacherOption extends StatelessWidget {
-  const TeacherOption({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: const [
-        ListTile(
-          leading: Icon(Icons.question_answer),
-          title: Text('자주 묻는 질문 관리'),
-        ),
-        ListTile(
-          leading: Icon(Icons.school),
-          title: Text('과목 및 교무실 정보'),
-        ),
-        ListTile(
-          leading: Icon(Icons.share),
-          title: Text('일정 공유 관리'),
-        ),
-      ],
     );
   }
 }
