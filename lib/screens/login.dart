@@ -18,103 +18,108 @@ class Login extends StatelessWidget {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) return;
 
-      final GoogleSignInAuthentication googleAuth = await googleUser
-          .authentication;
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      final UserCredential userCredential = await _auth.signInWithCredential(
-          credential);
+      final UserCredential userCredential = await _auth.signInWithCredential(credential);
       final User? user = userCredential.user;
 
       if (user == null || user.email == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('로그인 실패')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('로그인 실패')));
         return;
       }
 
-      final email = user.email!;
-      final name = user.displayName ?? '';
-      final uid = user.uid;
-
-      if (!email.endsWith('@e-mirim.hs.kr')) {
-        await _googleSignIn.signOut();
-        await _auth.signOut();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('학교 이메일(@e-mirim.hs.kr)로만 로그인 가능합니다.')),
-        );
-        return;
-      }
-
-      //요청 /api/login
+      // /api/login 요청
       final response = await http.post(
-        Uri.parse('http://172.30.1.94:8088/api/login'), // 실제 서버 주소로 교체
+        Uri.parse('http://172.30.1.94:8088/api/login'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ${googleAuth.idToken}',
         },
-        body: jsonEncode({
-          'token': googleAuth.idToken,
-        }),
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-        if (jsonResponse['success'] == true) {
-          final user = jsonResponse['data'];
-          final userid = user['userid'];
-          final name = user['name'];
-          final email = user['email'];
-          final userType = user['usertype'];
+        final jsonResponse = jsonDecode(response.body);
+        final success = jsonResponse['success'] ?? false;
 
+        if (!success) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('로그인 실패')));
+          return;
+        }
+
+        final userType = jsonResponse['data']['userType'];
+        final isNewUser = jsonResponse['data']['isNewUser'] ?? false;
+
+        // 신규 교사 → 교무실 위치, 담당과목 입력 팝업
+        if (userType == "TEACHER" && isNewUser) {
           await showDialog(
             context: context,
-            builder: (BuildContext context) {
+            builder: (context) {
+              final TextEditingController officeController = TextEditingController();
+              final TextEditingController subjectController = TextEditingController();
+
               return AlertDialog(
-                title: Text('알림 수신 동의'),
-                content: Text('Q&A 앱 내 채팅 관련 알림을 수신하시겠습니까?'),
+                title: Text('선생님 정보 입력'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: officeController,
+                      decoration: InputDecoration(labelText: '교무실 위치'),
+                    ),
+                    TextField(
+                      controller: subjectController,
+                      decoration: InputDecoration(labelText: '담당 과목'),
+                    ),
+                  ],
+                ),
                 actions: [
                   TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(); // 팝업 닫기
-                      // ✅ 동의한 경우 처리 (예: 알림 설정 저장)
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Home()),
-                      );
-                    },
-                    child: Text('동의'),
-                  ),
-                  TextButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      // TODO: 서버에 추가 정보 전송 API가 있다면 여기에 요청
                       Navigator.of(context).pop();
-                      // ✅ 비동의한 경우에도 페이지 이동
-                      Navigator.push(
+
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (context) => Home()),
                       );
                     },
-                    child: Text('비동의'),
+                    child: Text('제출'),
                   ),
                 ],
               );
             },
           );
-          Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Home()),);
         } else {
-          print('서버 오류: ${response.body}');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('서버 오류: ${response.statusCode}')),
+          // 학생 또는 기존 선생님
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => Home()),
           );
         }
+      } else if (response.statusCode == 403) {
+        // 학교 이메일 아님
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('학교 이메일이 아닙니다. 다른 계정으로 로그인해주세요.')),
+        );
+
+        await _googleSignIn.signOut(); // 현재 계정 로그아웃
+      } else if (response.statusCode == 401) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('인증 실패: 유효하지 않은 토큰')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('서버 오류: ${response.statusCode}')),
+        );
       }
     } catch (e) {
       print('로그인 오류: $e');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('로그인 중 오류 발생')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('에엑따')));
     }
   }
 
