@@ -1,5 +1,5 @@
 name: qna_frontend
-description: "A new Flutter project."
+description: "it show qna fend."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -30,15 +30,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_sign_in: ^6.0.0  # 로그인 dependencies
-
-  firebase_auth: ^5.5.4
-  firebase_core: ^3.13.1
-
-  firebase_core_web: ^2.10.0
-  firebase_auth_web: ^5.8.13
-
+  intl: ^0.18.1
+  google_sign_in: ^6.0.0
+  firebase_auth: ^4.0.0
+  firebase_core: ^2.0.0
   table_calendar: ^3.0.9
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -53,7 +50,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^6.0.0
+  flutter_lints: ^5.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -71,7 +68,6 @@ flutter:
     - assets/images/google_logo.png
     - assets/images/topNav.png
     - assets/images/def_photo.png
-    - assets/images/share.png
     - assets/btns/mypgDis.png
     - assets/btns/mypgAct.png
     - assets/btns/chatDis.png
@@ -85,7 +81,6 @@ flutter:
     - assets/icons/icon_back.png
     - assets/icons/icon_plusFile.png
     - assets/icons/icon_input.png
-
 
   # To add assets to your application, add an assets section, like this:
   # assets:
