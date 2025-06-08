@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class MySchoolTeachers extends StatefulWidget {
+class MySchoolTeachersLink extends StatefulWidget {
   @override
-  _MySchoolTeachersState createState() => _MySchoolTeachersState();
+  _MySchoolTeachersLinkState createState() => _MySchoolTeachersLinkState();
 }
 
-class _MySchoolTeachersState extends State<MySchoolTeachers> {
+class _MySchoolTeachersLinkState extends State<MySchoolTeachersLink> {
   String selectedGrade = '학년';
   String selectedClass = '반';
   final List<String> grades = ['1학년', '2학년', '3학년'];
