@@ -32,8 +32,8 @@ dependencies:
     sdk: flutter
   google_sign_in: ^6.0.0  # 로그인 dependencies
 
-  firebase_auth: ^4.17.7
-  firebase_core: ^2.27.0
+  firebase_auth: ^5.5.4
+  firebase_core: ^3.13.1
 
   firebase_core_web: ^2.10.0
   firebase_auth_web: ^5.8.13
@@ -51,7 +51,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -67,6 +67,23 @@ flutter:
   assets:
     - assets/images/Q&A.png
     - assets/images/google_logo.png
+    - assets/images/topNav.png
+    - assets/images/def_photo.png
+    - assets/images/share.png
+    - assets/btns/mypgDis.png
+    - assets/btns/mypgAct.png
+    - assets/btns/chatDis.png
+    - assets/btns/chatAct.png
+    - assets/btns/calDis.png
+    - assets/btns/calAct.png
+    - assets/btns/optDis.png
+    - assets/btns/optAct.png
+    - assets/icons/icon_search.png
+    - assets/icons/icon_plusChat.png
+    - assets/icons/icon_back.png
+    - assets/icons/icon_plusFile.png
+    - assets/icons/icon_input.png
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:
