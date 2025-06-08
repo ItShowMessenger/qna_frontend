@@ -4,35 +4,31 @@ import 'package:qna_frontend/screens/option_stu.dart';
 import 'calendar.dart';
 import 'home.dart';
 
-class MySchoolTeachers extends StatefulWidget {
+class MySchoolTeachersLink extends StatefulWidget {
   @override
-  _MySchoolTeachersState createState() => _MySchoolTeachersState();
+  _MySchoolTeachersLinkState createState() => _MySchoolTeachersLinkState();
 }
 
-class _MySchoolTeachersState extends State<MySchoolTeachers> {
+class _MySchoolTeachersLinkState extends State<MySchoolTeachersLink> {
+  String selectedGrade = '학년';
+  String selectedClass = '반';
+  final List<String> grades = ['1학년', '2학년', '3학년'];
+  final List<String> classes = ['1반', '2반', '3반'];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       body: Column(
         children: [
-          Image.asset(
-            'assets/images/topNav.png', // 실제 위치 맞춰주세요
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: 32, // 이미지 높이 조정
-          ),
+          // 상단 앱바
           Container(
-            padding: EdgeInsets.only(top: 12, left: 16, right: 16, bottom: 15),
+            padding: EdgeInsets.only(top: 42, left: 16, right: 16, bottom: 12),
             color: Color(0xFF566B92),
-            child: Stack(
-              alignment: Alignment.center,
+            child: Row(
               children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Icon(Icons.arrow_back, color: Colors.white),
-                ),
+                Icon(Icons.arrow_back, color: Colors.white),
+                SizedBox(width: 16),
                 Text(
                   '우리 학교 선생님',
                   style: TextStyle(color: Colors.white, fontSize: 20),
@@ -41,79 +37,127 @@ class _MySchoolTeachersState extends State<MySchoolTeachers> {
             ),
           ),
 
-          // 검색창
+          // 필터 영역
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: SizedBox(
-              width: double.infinity,
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: '성함으로 찾기',
-                  prefixIcon: Icon(Icons.search),
-                  contentPadding: EdgeInsets.symmetric(vertical: 0),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(6),
+            child: Row(
+              children: [
+                DropdownButton<String>(
+                  value: selectedGrade,
+                  items:
+                      ['학년', ...grades].map((grade) {
+                        return DropdownMenuItem<String>(
+                          value: grade,
+                          child: Text(grade),
+                        );
+                      }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedGrade = value!;
+                    });
+                  },
+                ),
+                SizedBox(width: 8),
+
+                // 반 드롭다운
+                DropdownButton<String>(
+                  value: selectedClass,
+                  items:
+                      ['반', ...classes].map((cls) {
+                        return DropdownMenuItem<String>(
+                          value: cls,
+                          child: Text(cls),
+                        );
+                      }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedClass = value!;
+                    });
+                  },
+                ),
+                SizedBox(width: 8),
+
+                // 검색창
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: '성함으로 찾기',
+                      prefixIcon: Icon(Icons.search),
+                      contentPadding: EdgeInsets.symmetric(vertical: 0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
 
-          // 선생님 항목 UI
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(6),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          SizedBox(height: 30),
+
+          // 비어있는 상태 메시지 (중앙 정렬)
+          Expanded(
+            child: Align(
+              alignment: Alignment(0, -0.2),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    margin: EdgeInsets.only(right: 12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.grey[300],
-                    ),
-                    child: Image.asset('assets/images/def_photo.png'),
+                  Text(
+                    '아직 Q&A에 가입하신 선생님이 없어요!',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
                   ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '선생님 이름',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                  SizedBox(height: 8),
+                  Text(
+                    '아래 버튼으로 초대해보세요!',
+                    style: TextStyle(fontSize: 14),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 24),
+                  SizedBox(
+                    width: 270,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // 링크 공유 기능
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF566B92),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '링크 공유하기',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          '담당 과목',
-                          style: TextStyle(color: Colors.grey[900]),
-                        ),
-                      ],
+                          SizedBox(width: 15),
+                          Image.asset(
+                            'assets/images/share.png',
+                            width: 20,
+                            height: 20,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
           ),
-
-          // Spacer
-          Expanded(child: SizedBox()),
 
           // 하단 탭바
           Container(
@@ -123,35 +167,42 @@ class _MySchoolTeachersState extends State<MySchoolTeachers> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 IconButton(
-                  icon: Image.asset('assets/btns/mypgAct.png', width: 40, height: 40),
+                  icon: Image.asset(
+                    'assets/btns/mypgAct.png',
+                    width: 40,
+                    height: 40,
+                  ),
                   onPressed: () {},
                 ),
                 IconButton(
-                  icon: Image.asset('assets/btns/chatDis.png', width: 40, height: 40),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Home()),
-                    );
-                  },
+                  icon: Image.asset(
+                    'assets/btns/chatDis.png',
+                    width: 40,
+                    height: 40,
+                  ),
+                  onPressed: () {Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Home()),);},
                 ),
                 IconButton(
-                  icon: Image.asset('assets/btns/calDis.png', width: 40, height: 40),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Calendar()),
-                    );
-                  },
+                  icon: Image.asset(
+                    'assets/btns/calDis.png',
+                    width: 40,
+                    height: 40,
+                  ),
+                  onPressed: () {Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Calendar()),);},
                 ),
                 IconButton(
-                  icon: Image.asset('assets/btns/optDis.png', width: 40, height: 40),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Option_stu()),
-                    );
-                  },
+                  icon: Image.asset(
+                    'assets/btns/optDis.png',
+                    width: 40,
+                    height: 40,
+                  ),
+                  onPressed: () {Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Option_stu()),);},
                 ),
               ],
             ),
