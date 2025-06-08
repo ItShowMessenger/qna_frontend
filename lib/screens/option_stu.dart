@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:qna_frontend/screens/MySchoolTeachers_link.dart';
 import 'package:qna_frontend/screens/calendar.dart';
 import 'package:qna_frontend/screens/home_input.dart';
 import 'package:qna_frontend/screens/login.dart'; // Login.dart import 필요
@@ -337,7 +338,11 @@ class _OptionState extends State<Option_stu> {
                   children: [
                     IconButton(
                       icon: Image.asset('assets/btns/mypgDis.png', width: 40),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => MySchoolTeachersLink()),
+                        );},
                     ),
                     IconButton(
                       icon: Image.asset('assets/btns/chatDis.png', width: 40),

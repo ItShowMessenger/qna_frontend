@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:qna_frontend/screens/option_stu.dart';
+
+import 'calendar.dart';
+import 'home.dart';
 
 class MySchoolTeachersLink extends StatefulWidget {
   @override
@@ -164,7 +168,7 @@ class _MySchoolTeachersLinkState extends State<MySchoolTeachersLink> {
               children: [
                 IconButton(
                   icon: Image.asset(
-                    'assets/btns/mypgDis.png',
+                    'assets/btns/mypgAct.png',
                     width: 40,
                     height: 40,
                   ),
@@ -176,7 +180,9 @@ class _MySchoolTeachersLinkState extends State<MySchoolTeachersLink> {
                     width: 40,
                     height: 40,
                   ),
-                  onPressed: () {},
+                  onPressed: () {Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Home()),);},
                 ),
                 IconButton(
                   icon: Image.asset(
@@ -184,7 +190,9 @@ class _MySchoolTeachersLinkState extends State<MySchoolTeachersLink> {
                     width: 40,
                     height: 40,
                   ),
-                  onPressed: () {},
+                  onPressed: () {Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Calendar()),);},
                 ),
                 IconButton(
                   icon: Image.asset(
@@ -192,7 +200,9 @@ class _MySchoolTeachersLinkState extends State<MySchoolTeachersLink> {
                     width: 40,
                     height: 40,
                   ),
-                  onPressed: () {},
+                  onPressed: () {Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Option_stu()),);},
                 ),
               ],
             ),
