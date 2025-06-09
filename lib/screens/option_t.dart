@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:qna_frontend/screens/MySchoolTeachers.dart';
 import 'package:qna_frontend/screens/calendar.dart';
+import 'package:qna_frontend/screens/home_input.dart';
 import 'package:qna_frontend/screens/login.dart'; // Login.dart import 필요
 
 import 'chat.dart';
@@ -370,5 +371,6 @@ class _OptionState extends State<Option_t> {
     );
   }
 }
+
 
 
