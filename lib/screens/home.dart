@@ -22,12 +22,13 @@ class Home extends StatelessWidget {
             ),
           ),
           Positioned( //채팅 + 검색 아이콘
-            top: 30,
+            top: 40,
             left: 0,
             right: 0,
             child: Container(
+              height: 50,
               color: Color(0xFF3C72BD), // #566B92 배경
-              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -41,11 +42,21 @@ class Home extends StatelessWidget {
                   Image.asset(
                     'assets/icons/icon_search.png', // 또는 Image.asset('assets/icon.png')
                     color: Colors.white,
-                    width: 40,
-                    height: 40,
+                    width: 30,
+                    height: 30,
                   ),
                 ],
               ),
+            ),
+          ),
+          Positioned(
+            top: 80,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 20,
+              color: Color(0xFF3C72BD),
+              padding: EdgeInsets.fromLTRB(25, 8, 25, 0),
             ),
           ),
           Positioned( // 채팅방 항목
