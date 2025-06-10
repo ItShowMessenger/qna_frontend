@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:qna_frontend/screens/MySchoolTeachers.dart';
 import 'package:qna_frontend/screens/calendar.dart';
 import 'package:qna_frontend/screens/login.dart'; // Login.dart import 필요
 
 import 'chat.dart';
 import 'home.dart';
 
-class Option_stu extends StatefulWidget {
+class Option_t extends StatefulWidget {
   @override
   _OptionState createState() => _OptionState();
 }
 
-class _OptionState extends State<Option_stu> {
+class _OptionState extends State<Option_t> {
   bool _notificationsEnabled = true;
   bool _calendarNotification = true;
   bool _chatNotification = true;
   final TextEditingController _statusMessageController = TextEditingController();
   final TextEditingController _deleteConfirmController = TextEditingController();
-  final String _accountName = '000 학생';
+  final String _accountName = '000';
 
   @override
   void dispose() {
@@ -25,25 +26,76 @@ class _OptionState extends State<Option_stu> {
     super.dispose();
   }
 
-  void _showLogoutOrDeletePopup() {
+  void _showDeleteConfirmPopup() {
+    showDialog(
+      context: context,
+      builder: (_) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: Text('회원탈퇴를 하시기 전 확인 해주세요.'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('- 참여하고 있던 채팅방에서 나가지며 대화 내역도 같이 삭제됩니다.'),
+                SizedBox(height: 8),
+                Text('- 개인 프로필 설정이 모두 사라집니다.'),
+                SizedBox(height: 16),
+                Text(
+                  '진행하시겠다면 이름 : $_accountName 을 입력해주세요.',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                TextField(
+                  controller: _deleteConfirmController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  _deleteConfirmController.clear();
+                  Navigator.pop(context);
+                },
+                child: Text('취소'),
+              ),
+              TextButton(
+                onPressed: () {
+                  if (_deleteConfirmController.text.trim() == _accountName) {
+                    Navigator.pop(context); // 입력 확인 다이얼로그 닫기
+                    _deleteConfirmController.clear();
+                    _showAlertThenMoveToLogin('회원탈퇴를 완료했습니다.');
+                  } else {
+                    _showAlert('입력값이 다릅니다.');
+                  }
+                },
+                child: Text('확인', style: TextStyle(color: Colors.red)),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  void _showAlertThenMoveToLogin(String message) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('로그아웃 혹은 회원탈퇴를 하시겠습니까?'),
+        content: Text(message),
         actions: [
           TextButton(
-            child: Text('회원탈퇴', style: TextStyle(color: Colors.red)),
             onPressed: () {
               Navigator.pop(context);
-              _showDeleteConfirmPopup();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => Login()),
+              );
             },
-          ),
-          TextButton(
-            child: Text('로그아웃'),
-            onPressed: () {
-              Navigator.pop(context);
-              _showLogoutConfirmPopup();
-            },
+            child: Text('확인'),
           ),
         ],
       ),
@@ -76,66 +128,6 @@ class _OptionState extends State<Option_stu> {
     );
   }
 
-  void _showDeleteConfirmPopup() {
-    showDialog(
-      context: context,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: Text('회원탈퇴를 하시기 전 확인 해주세요.'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '- 참여하고 있던 채팅방에서 나가지며 대화 내역도 같이 사라집니다.',
-                style: TextStyle(fontSize: 16),
-              ),
-              SizedBox(height: 8),
-              Text(
-                '- 개인 프로필 설정이 모두 사라집니다.',
-                style: TextStyle(fontSize: 16),
-              ),
-              SizedBox(height: 16),
-              Text(
-                '진행하시겠다면 이름 : $_accountName 을 입력해주세요.',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                controller: _deleteConfirmController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              child: Text('취소'),
-              onPressed: () {
-                _deleteConfirmController.clear();
-                Navigator.pop(context);
-              },
-            ),
-            TextButton(
-              child: Text('확인', style: TextStyle(color: Colors.red)),
-              onPressed: () {
-                if (_deleteConfirmController.text.trim() == _accountName) {
-                  Navigator.pop(context);
-                  _deleteConfirmController.clear();
-                  _showAlertThenMoveToLogin('회원탈퇴를 완료했습니다.');
-                } else {
-                  _showAlert('입력값이 다릅니다.');
-                }
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-
   void _showAlert(String message) {
     showDialog(
       context: context,
@@ -145,27 +137,6 @@ class _OptionState extends State<Option_stu> {
           TextButton(
             child: Text('확인'),
             onPressed: () => Navigator.pop(context),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showAlertThenMoveToLogin(String message) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        content: Text(message),
-        actions: [
-          TextButton(
-            child: Text('확인'),
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => Login()),
-              );
-            },
           ),
         ],
       ),
@@ -223,7 +194,7 @@ class _OptionState extends State<Option_stu> {
                           ),
                         ),
                         SizedBox(width: 16),
-                        Text('000 학생',
+                        Text('000 선생님',
                             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                       ],
                     ),
@@ -238,18 +209,31 @@ class _OptionState extends State<Option_stu> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('상태 메시지', style: TextStyle(fontSize: 18)),
-                            TextField(
-                              controller: _statusMessageController,
-                              decoration: InputDecoration(
-                                hintText: '(상태메시지가 없습니다)',
-                                hintStyle: TextStyle(color: Colors.grey),
-                                border: InputBorder.none,
-                              ),
-                              maxLines: null,
-                            ),
+                            Text('담당과목 : 수학', style: TextStyle(fontSize: 18)),
+                            SizedBox(width: 320, height: 15),
+                            Text('교무실 : 2교무실', style: TextStyle(fontSize: 18)),
+                            // TextField(
+                            //   controller: _statusMessageController,
+                            //   decoration: InputDecoration(
+                            //     hintText: '(상태메시지가 없습니다)',
+                            //     hintStyle: TextStyle(color: Colors.grey),
+                            //     border: InputBorder.none,
+                            //   ),
+                            //   maxLines: null,
+                            // ),
                           ],
                         ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ListTile(
+                        title: Text('자주하는 질문', style: TextStyle(fontSize: 18)),
+                        //질문 리스트 작성
                       ),
                     ),
                     SizedBox(height: 20),
@@ -317,13 +301,25 @@ class _OptionState extends State<Option_stu> {
                       ),
                       child: ListTile(
                         title: Text('로그아웃', style: TextStyle(fontSize: 18)),
-                        onTap: _showLogoutOrDeletePopup,
+                        //onTap: 다시 만드슨 ㅋ,
                       ),
                     ),
+                    Center(
+                      child: TextButton(
+                        onPressed: _showDeleteConfirmPopup,
+                        child: Text(
+                          '회원탈퇴',
+                          style: TextStyle(color: Colors.grey, fontSize: 16),
+                        ),
+                      ),
+                    ),
+
                   ],
                 ),
               ),
             ),
+
+
             Positioned(
               bottom: 0,
               left: 0,
@@ -336,7 +332,11 @@ class _OptionState extends State<Option_stu> {
                   children: [
                     IconButton(
                       icon: Image.asset('assets/btns/mypgDis.png', width: 40),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => MySchoolTeachers()),
+                        );},
                     ),
                     IconButton(
                       icon: Image.asset('assets/btns/chatDis.png', width: 40),
@@ -370,6 +370,5 @@ class _OptionState extends State<Option_stu> {
     );
   }
 }
-
 
 

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qna_frontend/screens/chat.dart';
 import 'package:qna_frontend/screens/home.dart';
-import 'package:qna_frontend/screens/home_input.dart';
 import 'package:qna_frontend/screens/login.dart';
 import 'package:qna_frontend/screens/splash.dart';
 
