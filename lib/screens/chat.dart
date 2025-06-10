@@ -56,6 +56,7 @@ class _ChatState extends State<Chat> {
   @override
   Widget build(BuildContext context) {
     final DateTime now = DateTime.now();
+    bool showAttachment = false;
     final String todayDate =
         '${now.year % 100}.${now.month.toString().padLeft(2, '0')}.${now.day.toString().padLeft(2, '0')}';
 
@@ -75,11 +76,11 @@ class _ChatState extends State<Chat> {
 
           // 네비게이션 바
           Positioned(
-            top: 42,
+            top: 40,
             left: 0,
             right: 0,
             child: Container(
-              color: Color(0xFF566B92),
+              color: Color(0xFF3C72BD),
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               child: Row(
                 children: [
@@ -204,7 +205,7 @@ class _ChatState extends State<Chat> {
                                   MediaQuery.of(context).size.width * 0.7,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Color(0xFF566B92),
+                                  color: Color(0xFF3C72BD),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
@@ -275,7 +276,9 @@ class _ChatState extends State<Chat> {
                       height: 28,
                     ),
                     onPressed: () {
-                      // 파일 추가 기능
+                      setState(() {
+                        showAttachment = !showAttachment;
+                      });
                     },
                   ),
                   SizedBox(width: 4),
@@ -283,7 +286,7 @@ class _ChatState extends State<Chat> {
                     child: TextField(
                       controller: _myController,
                       decoration: InputDecoration(
-                        hintText: '내 메시지 입력',
+                        hintText: '메세지를 입력해주세요.',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -302,6 +305,37 @@ class _ChatState extends State<Chat> {
                     ),
                     onPressed: () => _sendMessage(isMe: true),
                   ),
+                  if (showAttachment)
+                    Positioned(
+                      bottom: 130,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 12),
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 10,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            //_attachmentButton(icon: Icons.photo, label: "사진"),
+                            //_attachmentButton(icon: Icons.insert_drive_file, label: "파일"),
+                            //_attachmentButton(icon: Icons.audiotrack, label: "오디오"),
+                            //_attachmentButton(icon: Icons.calendar_today, label: "일정"),
+                          ],
+                        ),
+                      ),
+                    ),
+
                 ],
               ),
             ),
