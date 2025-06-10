@@ -254,12 +254,12 @@ class _OptionState extends State<Option_stu> {
                               style: TextStyle(
                                 color: Colors.grey,
                                 fontSize: 16,
-                              ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
-                    ),
                     SizedBox(height: 30),
                     // Card(
                     //   elevation: 2,
