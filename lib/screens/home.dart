@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:qna_frontend/screens/MySchoolTeachers.dart';
 import 'package:qna_frontend/screens/option_stu.dart';
 
 import 'calendar.dart';
@@ -206,7 +207,9 @@ class _HomeState extends State<Home> {
                   children: [
                     IconButton(
                       icon: Image.asset('assets/btns/mypgDis.png', width: 40, height: 40),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => MySchoolTeachers()));
+                      },
                     ),
                     IconButton(
                       icon: Image.asset('assets/btns/chatAct.png', width: 40, height: 40),
