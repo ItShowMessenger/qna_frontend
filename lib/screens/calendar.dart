@@ -64,7 +64,7 @@ class _CalendarState extends State<Calendar> {
 
           // 타이틀 바
           Positioned(
-            top: 35,
+            top: 40,
             left: 0,
             right: 0,
             child: Container(
