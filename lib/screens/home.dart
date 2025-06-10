@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:qna_frontend/screens/home_input.dart';
-import 'package:qna_frontend/screens/option.dart';
+import 'package:qna_frontend/screens/option_stu.dart';
 
 import 'calendar.dart';
 import 'chat.dart';
@@ -23,11 +22,11 @@ class Home extends StatelessWidget {
             ),
           ),
           Positioned( //채팅 + 검색 아이콘
-            top: 40,
+            top: 30,
             left: 0,
             right: 0,
             child: Container(
-              color: Color(0xFF566B92), // #566B92 배경
+              color: Color(0xFF3C72BD), // #566B92 배경
               padding: EdgeInsets.symmetric(horizontal: 25, vertical: 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -114,7 +113,7 @@ class Home extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: Color(0xFF566B92),
+                            color: Color(0xFF3C72BD),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -135,30 +134,13 @@ class Home extends StatelessWidget {
             ),
           ),
 
-          Positioned( // 채팅방 추가 버튼
-            top: 230,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Home_input()),
-                  );
-                  },
-                icon: Image.asset('assets/icons/icon_plusChat.png', width: 50, height: 50,)
-              ),
-            ),
-          ),
-
 
           Positioned( // 하단 탭 바
             bottom: 0,
             left: 0,
             right: 0,
             child: Container(
-              color: Color(0xFF566B92),
+              color: Color(0xFF3C72BD),
               padding: EdgeInsets.symmetric(vertical: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -184,7 +166,7 @@ class Home extends StatelessWidget {
                     icon: Image.asset('assets/btns/optDis.png', width: 40, height: 40,),
                     onPressed: () {Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Option()),
+                      MaterialPageRoute(builder: (context) => Option_stu()),
                     );},
                   ),
                 ],
