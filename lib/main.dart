@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:qna_frontend/screens/chat.dart';
 import 'package:qna_frontend/screens/home.dart';
 import 'package:qna_frontend/screens/login.dart';
+import 'package:qna_frontend/screens/option_t.dart';
 import 'package:qna_frontend/screens/splash.dart';
 
 Future<void> main() async {
@@ -23,7 +24,7 @@ class QAApp extends StatelessWidget {
         primarySwatch: Colors.indigo,
         scaffoldBackgroundColor: Color(0xFFF5F5F5),
       ),
-      home: Home(),
+      home: Option_t(),
       debugShowCheckedModeBanner: false,
     );
   }
