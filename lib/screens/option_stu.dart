@@ -203,7 +203,7 @@ class _OptionState extends State<Option_stu> {
               right: 0,
               child: Container(
                 height: 60,
-                color: Color(0xFF566B92),
+                color: Color(0xFF3C72BD),
                 padding: EdgeInsets.fromLTRB(25, 8, 25, 0),
                 child: Align(
                   alignment: Alignment.topLeft,
@@ -367,7 +367,7 @@ class _OptionState extends State<Option_stu> {
               left: 0,
               right: 0,
               child: Container(
-                color: Color(0xFF566B92),
+                color: Color(0xFF3C72BD),
                 padding: EdgeInsets.symmetric(vertical: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,

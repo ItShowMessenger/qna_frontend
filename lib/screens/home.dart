@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qna_frontend/screens/option_stu.dart';
+import 'package:qna_frontend/screens/option_t.dart';
 
 import 'calendar.dart';
 import 'chat.dart';
@@ -177,7 +178,7 @@ class Home extends StatelessWidget {
                     icon: Image.asset('assets/btns/optDis.png', width: 40, height: 40,),
                     onPressed: () {Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Option_stu()),
+                      MaterialPageRoute(builder: (context) => Option_t()),
                     );},
                   ),
                 ],

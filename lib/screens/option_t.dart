@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qna_frontend/screens/MySchoolTeachers.dart';
 import 'package:qna_frontend/screens/calendar.dart';
-import 'package:qna_frontend/screens/home_input.dart';
 import 'package:qna_frontend/screens/login.dart'; // Login.dart import 필요
 
 import 'chat.dart';
@@ -144,6 +143,7 @@ class _OptionState extends State<Option_t> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -163,7 +163,7 @@ class _OptionState extends State<Option_t> {
               right: 0,
               child: Container(
                 height: 60,
-                color: Color(0xFF566B92),
+                color: Color(0xFF3C72BD),
                 padding: EdgeInsets.fromLTRB(25, 8, 25, 0),
                 child: Align(
                   alignment: Alignment.topLeft,
@@ -326,7 +326,7 @@ class _OptionState extends State<Option_t> {
               left: 0,
               right: 0,
               child: Container(
-                color: Color(0xFF566B92),
+                color: Color(0xFF3C72BD),
                 padding: EdgeInsets.symmetric(vertical: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
