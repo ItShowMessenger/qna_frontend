@@ -10,7 +10,7 @@ class Login extends StatelessWidget {
   final TextEditingController idController = TextEditingController();
   final TextEditingController pwController = TextEditingController();
 
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final  GoogleSignIn _googleSignIn= GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<void> _handleGoogleLogin(BuildContext context) async {
@@ -24,21 +24,17 @@ class Login extends StatelessWidget {
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      print(googleAuth.idToken);
 
       final UserCredential userCredential = await _auth.signInWithCredential(credential);
       final User? user = userCredential.user;
-
-      if (user == null || user.email == null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('로그인 실패')));
-        return;
-      }
+      final idTokenResult = await user?.getIdTokenResult(true);
+      print("userIdToken: + ${idTokenResult?.token}");
 
       final response = await http.post(
         Uri.parse('http://172.30.1.94:8088/api/login'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${googleAuth.idToken}',
+          'Authorization': 'Bearer ${idTokenResult?.token}',
         },
         body: jsonEncode({}),
       );
@@ -48,7 +44,6 @@ class Login extends StatelessWidget {
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        print('에레레레레 $jsonResponse');
         final success = jsonResponse['success'] ?? false;
         if (jsonResponse['data'] is Map<String, dynamic>) {
           final Map<String, dynamic> userData = jsonResponse['data'];
