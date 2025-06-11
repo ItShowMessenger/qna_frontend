@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:qna_frontend/screens/MySchoolTeachers.dart';
 import 'package:qna_frontend/screens/calendar.dart';
 import 'package:qna_frontend/screens/login.dart'; // Login.dart import 필요
+import 'package:qna_frontend/screens/splash.dart';
 
 import 'chat.dart';
 import 'home.dart';
@@ -92,7 +93,7 @@ class _OptionState extends State<Option_t> {
               Navigator.pop(context);
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => Login()),
+                MaterialPageRoute(builder: (context) => Splash()),
               );
             },
             child: Text('확인'),
@@ -143,7 +144,6 @@ class _OptionState extends State<Option_t> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -155,10 +155,15 @@ class _OptionState extends State<Option_t> {
               top: 0,
               left: 0,
               right: 0,
-              child: Image.asset('assets/images/topNav.png', fit: BoxFit.cover),
+              child: Image.asset(
+                'assets/images/topNav.png',
+                fit: BoxFit.cover,
+              ),
             ),
+
+            // 타이틀 바
             Positioned(
-              top: 46,
+              top: 40,
               left: 0,
               right: 0,
               child: Container(
@@ -169,7 +174,10 @@ class _OptionState extends State<Option_t> {
                   alignment: Alignment.topLeft,
                   child: Text(
                     '옵션',
-                    style: TextStyle(color: Colors.white, fontSize: 23),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 23,
+                    ),
                   ),
                 ),
               ),
@@ -195,8 +203,26 @@ class _OptionState extends State<Option_t> {
                           ),
                         ),
                         SizedBox(width: 16),
-                        Text('000 선생님',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start, // 텍스트 왼쪽 정렬
+                          children: [
+                            Text(
+                              '선생님 000',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 4), // 간격 조정
+                            Text(
+                              's2316@e-mirim.hs.kr',
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                     SizedBox(height: 30),
@@ -302,7 +328,7 @@ class _OptionState extends State<Option_t> {
                       ),
                       child: ListTile(
                         title: Text('로그아웃', style: TextStyle(fontSize: 18)),
-                        //onTap: 다시 만드슨 ㅋ,
+                        onTap: _showLogoutConfirmPopup,
                       ),
                     ),
                     Center(
@@ -371,6 +397,3 @@ class _OptionState extends State<Option_t> {
     );
   }
 }
-
-
-

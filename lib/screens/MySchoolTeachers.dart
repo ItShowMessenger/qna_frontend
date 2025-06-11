@@ -14,9 +14,9 @@ class _MySchoolTeachersState extends State<MySchoolTeachers> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
-      body: Column(
+      body: Stack(
         children: [
+          // 상단 네비게이션 이미지
           Positioned(
             top: 0,
             left: 0,
@@ -26,27 +26,44 @@ class _MySchoolTeachersState extends State<MySchoolTeachers> {
               fit: BoxFit.cover,
             ),
           ),
-          Container(
-            padding: EdgeInsets.only(top: 12, left: 16, right: 16, bottom: 15),
-            color: Color(0xFF3C72BD),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Icon(Icons.arrow_back, color: Colors.white),
-                ),
-                Text(
+          // 검색 아이콘 (원래 Positioned가 아니었던 부분을 Positioned로 감쌈)
+          Positioned(
+            top: 50, // 필요에 따라 위치 조정
+            right: 16,
+            child: Image.asset(
+              'assets/icons/icon_search.png',
+              color: Colors.white,
+              width: 30,
+              height: 30,
+            ),
+          ),
+          // 타이틀 바
+          Positioned(
+            top: 40,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 60,
+              color: Color(0xFF3C72BD),
+              padding: EdgeInsets.fromLTRB(25, 0, 25, 0),
+              child: Align(
+                alignment: Alignment.center,
+                child: Text(
                   '우리 학교 선생님',
-                  style: TextStyle(color: Colors.white, fontSize: 20),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 23,
+                  ),
                 ),
-              ],
+              ),
             ),
           ),
 
           // 검색창
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          Positioned(
+            top: 120, // 타이틀 바 아래에 배치 (예시)
+            left: 16,
+            right: 16,
             child: SizedBox(
               width: double.infinity,
               child: TextField(
@@ -61,10 +78,11 @@ class _MySchoolTeachersState extends State<MySchoolTeachers> {
               ),
             ),
           ),
-
-          // 선생님 항목 UI
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          // 선생님 항목 UI (Padding 대신 Positioned로 배치)
+          Positioned(
+            top: 190, // 검색창 아래에 배치 (예시)
+            left: 16,
+            right: 16,
             child: Container(
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -114,49 +132,66 @@ class _MySchoolTeachersState extends State<MySchoolTeachers> {
               ),
             ),
           ),
-
-          // Spacer
-          Expanded(child: SizedBox()),
-
-          // 하단 탭바
-          Container(
-            color: Color(0xFF3C72BD),
-            padding: EdgeInsets.symmetric(vertical: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                IconButton(
-                  icon: Image.asset('assets/btns/mypgAct.png', width: 40, height: 40),
-                  onPressed: () {},
-                ),
-                IconButton(
-                  icon: Image.asset('assets/btns/chatDis.png', width: 40, height: 40),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Home()),
-                    );
-                  },
-                ),
-                IconButton(
-                  icon: Image.asset('assets/btns/calDis.png', width: 40, height: 40),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Calendar()),
-                    );
-                  },
-                ),
-                IconButton(
-                  icon: Image.asset('assets/btns/optDis.png', width: 40, height: 40),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Option_stu()),
-                    );
-                  },
-                ),
-              ],
+          // 하단 탭바 (원래 Container였던 부분도 Positioned로 배치)
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              color: Color(0xFF3C72BD),
+              padding: EdgeInsets.symmetric(vertical: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  IconButton(
+                    icon: Image.asset(
+                      'assets/btns/mypgAct.png',
+                      width: 40,
+                      height: 40,
+                    ),
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    icon: Image.asset(
+                      'assets/btns/chatDis.png',
+                      width: 40,
+                      height: 40,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Home()),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: Image.asset(
+                      'assets/btns/calDis.png',
+                      width: 40,
+                      height: 40,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Calendar()),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: Image.asset(
+                      'assets/btns/optDis.png',
+                      width: 40,
+                      height: 40,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Option_stu()),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ],

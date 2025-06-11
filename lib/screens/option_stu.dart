@@ -16,9 +16,9 @@ class _OptionState extends State<Option_stu> {
   bool _calendarNotification = true;
   bool _chatNotification = true;
   final TextEditingController _statusMessageController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController _deleteConfirmController =
-      TextEditingController();
+  TextEditingController();
   final String _accountName = '000 학생';
 
   @override
@@ -33,24 +33,24 @@ class _OptionState extends State<Option_stu> {
       context: context,
       builder:
           (_) => AlertDialog(
-            title: Text('로그아웃 혹은 회원탈퇴를 하시겠습니까?'),
-            actions: [
-              TextButton(
-                child: Text('회원탈퇴', style: TextStyle(color: Colors.red)),
-                onPressed: () {
-                  Navigator.pop(context);
-                  _showDeleteConfirmPopup();
-                },
-              ),
-              TextButton(
-                child: Text('로그아웃'),
-                onPressed: () {
-                  Navigator.pop(context);
-                  _showLogoutConfirmPopup();
-                },
-              ),
-            ],
+        title: Text('로그아웃 혹은 회원탈퇴를 하시겠습니까?'),
+        actions: [
+          TextButton(
+            child: Text('회원탈퇴', style: TextStyle(color: Colors.red)),
+            onPressed: () {
+              Navigator.pop(context);
+              _showDeleteConfirmPopup();
+            },
           ),
+          TextButton(
+            child: Text('로그아웃'),
+            onPressed: () {
+              Navigator.pop(context);
+              _showLogoutConfirmPopup();
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -59,25 +59,25 @@ class _OptionState extends State<Option_stu> {
       context: context,
       builder:
           (_) => AlertDialog(
-            title: Text('로그아웃시 초기화면으로 돌아갑니다.'),
-            content: Text('로그아웃 하시겠습니까?'),
-            actions: [
-              TextButton(
-                child: Text('취소'),
-                onPressed: () => Navigator.pop(context),
-              ),
-              TextButton(
-                child: Text('로그아웃'),
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => Login()),
-                  );
-                },
-              ),
-            ],
+        title: Text('로그아웃시 초기화면으로 돌아갑니다.'),
+        content: Text('로그아웃 하시겠습니까?'),
+        actions: [
+          TextButton(
+            child: Text('취소'),
+            onPressed: () => Navigator.pop(context),
           ),
+          TextButton(
+            child: Text('로그아웃'),
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => Login()),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -86,63 +86,63 @@ class _OptionState extends State<Option_stu> {
       context: context,
       builder:
           (_) => StatefulBuilder(
-            builder:
-                (context, setState) => AlertDialog(
-                  title: Text('회원탈퇴를 하시기 전 확인 해주세요.'),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '- 참여하고 있던 채팅방에서 나가지며 대화 내역도 같이 사라집니다.',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        '- 개인 프로필 설정이 모두 사라집니다.',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        '진행하시겠다면 이름 : $_accountName 을 입력해주세요.',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      TextField(
-                        controller: _deleteConfirmController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                    ],
-                  ),
-                  actions: [
-                    TextButton(
-                      child: Text('취소'),
-                      onPressed: () {
-                        _deleteConfirmController.clear();
-                        Navigator.pop(context);
-                      },
-                    ),
-                    TextButton(
-                      child: Text('확인', style: TextStyle(color: Colors.red)),
-                      onPressed: () {
-                        if (_deleteConfirmController.text.trim() ==
-                            _accountName) {
-                          Navigator.pop(context);
-                          _deleteConfirmController.clear();
-                          _showAlertThenMoveToLogin('회원탈퇴를 완료했습니다.');
-                        } else {
-                          _showAlert('입력값이 다릅니다.');
-                        }
-                      },
-                    ),
-                  ],
+        builder:
+            (context, setState) => AlertDialog(
+          title: Text('회원탈퇴를 하시기 전 확인 해주세요.'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '- 참여하고 있던 채팅방에서 나가지며 대화 내역도 같이 사라집니다.',
+                style: TextStyle(fontSize: 16),
+              ),
+              SizedBox(height: 8),
+              Text(
+                '- 개인 프로필 설정이 모두 사라집니다.',
+                style: TextStyle(fontSize: 16),
+              ),
+              SizedBox(height: 16),
+              Text(
+                '진행하시겠다면 이름 : $_accountName 을 입력해주세요.',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: _deleteConfirmController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
           ),
+          actions: [
+            TextButton(
+              child: Text('취소'),
+              onPressed: () {
+                _deleteConfirmController.clear();
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text('확인', style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                if (_deleteConfirmController.text.trim() ==
+                    _accountName) {
+                  Navigator.pop(context);
+                  _deleteConfirmController.clear();
+                  _showAlertThenMoveToLogin('회원탈퇴를 완료했습니다.');
+                } else {
+                  _showAlert('입력값이 다릅니다.');
+                }
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -151,14 +151,14 @@ class _OptionState extends State<Option_stu> {
       context: context,
       builder:
           (_) => AlertDialog(
-            content: Text(message),
-            actions: [
-              TextButton(
-                child: Text('확인'),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
+        content: Text(message),
+        actions: [
+          TextButton(
+            child: Text('확인'),
+            onPressed: () => Navigator.pop(context),
           ),
+        ],
+      ),
     );
   }
 
@@ -167,20 +167,20 @@ class _OptionState extends State<Option_stu> {
       context: context,
       builder:
           (_) => AlertDialog(
-            content: Text(message),
-            actions: [
-              TextButton(
-                child: Text('확인'),
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => Login()),
-                  );
-                },
-              ),
-            ],
+        content: Text(message),
+        actions: [
+          TextButton(
+            child: Text('확인'),
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => Login()),
+              );
+            },
           ),
+        ],
+      ),
     );
   }
 
@@ -198,7 +198,7 @@ class _OptionState extends State<Option_stu> {
               child: Image.asset('assets/images/topNav.png', fit: BoxFit.cover),
             ),
             Positioned(
-              top: 46,
+              top: 40,
               left: 0,
               right: 0,
               child: Container(
@@ -209,7 +209,10 @@ class _OptionState extends State<Option_stu> {
                   alignment: Alignment.topLeft,
                   child: Text(
                     '옵션',
-                    style: TextStyle(color: Colors.white, fontSize: 23),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 23,
+                    ),
                   ),
                 ),
               ),
@@ -308,13 +311,13 @@ class _OptionState extends State<Option_stu> {
                               trailing: Switch(
                                 value: _calendarNotification,
                                 onChanged:
-                                    _notificationsEnabled
-                                        ? (bool value) {
-                                          setState(() {
-                                            _calendarNotification = value;
-                                          });
-                                        }
-                                        : null,
+                                _notificationsEnabled
+                                    ? (bool value) {
+                                  setState(() {
+                                    _calendarNotification = value;
+                                  });
+                                }
+                                    : null,
                               ),
                             ),
                             ListTile(
@@ -325,13 +328,13 @@ class _OptionState extends State<Option_stu> {
                               trailing: Switch(
                                 value: _chatNotification,
                                 onChanged:
-                                    _notificationsEnabled
-                                        ? (bool value) {
-                                          setState(() {
-                                            _chatNotification = value;
-                                          });
-                                        }
-                                        : null,
+                                _notificationsEnabled
+                                    ? (bool value) {
+                                  setState(() {
+                                    _chatNotification = value;
+                                  });
+                                }
+                                    : null,
                               ),
                             ),
                           ],
