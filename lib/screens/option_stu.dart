@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qna_frontend/screens/MySchoolTeachers_link.dart';
+import 'package:qna_frontend/screens/MySchoolTeachers.dart';
 import 'package:qna_frontend/screens/calendar.dart';
 import 'package:qna_frontend/screens/login.dart'; // Login.dart import 필요
 
@@ -15,8 +15,10 @@ class _OptionState extends State<Option_stu> {
   bool _notificationsEnabled = true;
   bool _calendarNotification = true;
   bool _chatNotification = true;
-  final TextEditingController _statusMessageController = TextEditingController();
-  final TextEditingController _deleteConfirmController = TextEditingController();
+  final TextEditingController _statusMessageController =
+  TextEditingController();
+  final TextEditingController _deleteConfirmController =
+  TextEditingController();
   final String _accountName = '000 학생';
 
   @override
@@ -29,7 +31,8 @@ class _OptionState extends State<Option_stu> {
   void _showLogoutOrDeletePopup() {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder:
+          (_) => AlertDialog(
         title: Text('로그아웃 혹은 회원탈퇴를 하시겠습니까?'),
         actions: [
           TextButton(
@@ -54,7 +57,8 @@ class _OptionState extends State<Option_stu> {
   void _showLogoutConfirmPopup() {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder:
+          (_) => AlertDialog(
         title: Text('로그아웃시 초기화면으로 돌아갑니다.'),
         content: Text('로그아웃 하시겠습니까?'),
         actions: [
@@ -80,8 +84,10 @@ class _OptionState extends State<Option_stu> {
   void _showDeleteConfirmPopup() {
     showDialog(
       context: context,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
+      builder:
+          (_) => StatefulBuilder(
+        builder:
+            (context, setState) => AlertDialog(
           title: Text('회원탈퇴를 하시기 전 확인 해주세요.'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -99,7 +105,10 @@ class _OptionState extends State<Option_stu> {
               SizedBox(height: 16),
               Text(
                 '진행하시겠다면 이름 : $_accountName 을 입력해주세요.',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               SizedBox(height: 10),
               TextField(
@@ -121,7 +130,8 @@ class _OptionState extends State<Option_stu> {
             TextButton(
               child: Text('확인', style: TextStyle(color: Colors.red)),
               onPressed: () {
-                if (_deleteConfirmController.text.trim() == _accountName) {
+                if (_deleteConfirmController.text.trim() ==
+                    _accountName) {
                   Navigator.pop(context);
                   _deleteConfirmController.clear();
                   _showAlertThenMoveToLogin('회원탈퇴를 완료했습니다.');
@@ -136,11 +146,11 @@ class _OptionState extends State<Option_stu> {
     );
   }
 
-
   void _showAlert(String message) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder:
+          (_) => AlertDialog(
         content: Text(message),
         actions: [
           TextButton(
@@ -155,7 +165,8 @@ class _OptionState extends State<Option_stu> {
   void _showAlertThenMoveToLogin(String message) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder:
+          (_) => AlertDialog(
         content: Text(message),
         actions: [
           TextButton(
@@ -187,18 +198,21 @@ class _OptionState extends State<Option_stu> {
               child: Image.asset('assets/images/topNav.png', fit: BoxFit.cover),
             ),
             Positioned(
-              top: 46,
+              top: 40,
               left: 0,
               right: 0,
               child: Container(
                 height: 60,
-                color: Color(0xFF566B92),
+                color: Color(0xFF3C72BD),
                 padding: EdgeInsets.fromLTRB(25, 8, 25, 0),
                 child: Align(
                   alignment: Alignment.topLeft,
                   child: Text(
                     '옵션',
-                    style: TextStyle(color: Colors.white, fontSize: 23),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 23,
+                    ),
                   ),
                 ),
               ),
@@ -224,35 +238,41 @@ class _OptionState extends State<Option_stu> {
                           ),
                         ),
                         SizedBox(width: 16),
-                        Text('000 학생',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                    SizedBox(height: 30),
-                    Card(
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start, // 텍스트 왼쪽 정렬
                           children: [
-                            Text('상태 메시지', style: TextStyle(fontSize: 18)),
-                            TextField(
-                              controller: _statusMessageController,
-                              decoration: InputDecoration(
-                                hintText: '(상태메시지가 없습니다)',
-                                hintStyle: TextStyle(color: Colors.grey),
-                                border: InputBorder.none,
+                            Text(
+                              '000 학생',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
                               ),
-                              maxLines: null,
+                            ),
+                            SizedBox(height: 4), // 간격 조정
+                            Text(
+                              's2316@e-mirim.hs.kr',
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 16,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ),
-                    ),
+                    SizedBox(height: 30),
+                    // Card(
+                    //   elevation: 2,
+                    //   shape: RoundedRectangleBorder(
+                    //     borderRadius: BorderRadius.circular(12),
+                    //   ),
+                    //   child: const ListTile(
+                    //     title: Text(
+                    //       's2316@e-mirim.hs.kr',
+                    //       style: TextStyle(fontSize: 18),
+                    //     ),
+                    //   ),
+                    // ),
                     SizedBox(height: 20),
                     Card(
                       elevation: 2,
@@ -264,7 +284,10 @@ class _OptionState extends State<Option_stu> {
                         child: Column(
                           children: [
                             ListTile(
-                              title: Text('전체 알림 설정', style: TextStyle(fontSize: 18)),
+                              title: Text(
+                                '전체 알림 설정',
+                                style: TextStyle(fontSize: 18),
+                              ),
                               trailing: Switch(
                                 value: _notificationsEnabled,
                                 activeColor: Color(0xFF566B92),
@@ -281,10 +304,14 @@ class _OptionState extends State<Option_stu> {
                             ),
                             Divider(),
                             ListTile(
-                              title: Text('일정 알림', style: TextStyle(fontSize: 15)),
+                              title: Text(
+                                '일정 알림',
+                                style: TextStyle(fontSize: 15),
+                              ),
                               trailing: Switch(
                                 value: _calendarNotification,
-                                onChanged: _notificationsEnabled
+                                onChanged:
+                                _notificationsEnabled
                                     ? (bool value) {
                                   setState(() {
                                     _calendarNotification = value;
@@ -294,10 +321,14 @@ class _OptionState extends State<Option_stu> {
                               ),
                             ),
                             ListTile(
-                              title: Text('채팅 알림', style: TextStyle(fontSize: 15)),
+                              title: Text(
+                                '채팅 알림',
+                                style: TextStyle(fontSize: 15),
+                              ),
                               trailing: Switch(
                                 value: _chatNotification,
-                                onChanged: _notificationsEnabled
+                                onChanged:
+                                _notificationsEnabled
                                     ? (bool value) {
                                   setState(() {
                                     _chatNotification = value;
@@ -321,6 +352,15 @@ class _OptionState extends State<Option_stu> {
                         onTap: _showLogoutOrDeletePopup,
                       ),
                     ),
+                    Center(
+                      child: TextButton(
+                        onPressed: _showDeleteConfirmPopup,
+                        child: Text(
+                          '회원탈퇴',
+                          style: TextStyle(color: Colors.grey, fontSize: 16),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -330,7 +370,7 @@ class _OptionState extends State<Option_stu> {
               left: 0,
               right: 0,
               child: Container(
-                color: Color(0xFF566B92),
+                color: Color(0xFF3C72BD),
                 padding: EdgeInsets.symmetric(vertical: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -340,8 +380,11 @@ class _OptionState extends State<Option_stu> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => MySchoolTeachersLink()),
-                        );},
+                          MaterialPageRoute(
+                            builder: (context) => MySchoolTeachers(),
+                          ),
+                        );
+                      },
                     ),
                     IconButton(
                       icon: Image.asset('assets/btns/chatDis.png', width: 40),
@@ -375,6 +418,3 @@ class _OptionState extends State<Option_stu> {
     );
   }
 }
-
-
-
