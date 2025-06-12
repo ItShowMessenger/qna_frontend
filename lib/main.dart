@@ -27,7 +27,7 @@ class QAApp extends StatelessWidget {
         primarySwatch: Colors.indigo,
         scaffoldBackgroundColor: Color(0xFFF5F5F5),
       ),
-      home: Splash(),
+      home: Option_stu(),
       debugShowCheckedModeBanner: false,
     );
   }
