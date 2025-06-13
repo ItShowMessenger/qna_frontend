@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:qna_frontend/screens/option.dart';
 import 'package:qna_frontend/screens/profile_stu.dart';
 
 Future<void> main() async {
@@ -32,7 +33,7 @@ class QAApp extends StatelessWidget {
         primarySwatch: Colors.indigo,
         scaffoldBackgroundColor: Color(0xFFF5F5F5),
       ),
-      home: Profile_stu(data: data),
+      home: OptionScreen(user: user),
       debugShowCheckedModeBanner: false,
     );
   }
