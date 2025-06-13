@@ -24,27 +24,122 @@ class _Profile_stuState extends State<Profile_stu> {
       child: Scaffold(
         body: Stack(
           children: [
-            // 상단 이미지, 타이틀 생략...
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Image.asset('assets/images/topNav.png', fit: BoxFit.cover),
+            ),
+            Positioned(
+              top: 40,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: 60,
+                color: Color(0xFF3C72BD),
+                padding: EdgeInsets.fromLTRB(25, 8, 25, 0),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    '프로필',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 23,
+                    ),
+                  ),
+                ),
+              ),
+            ),
             Positioned(
               top: 140,
-              left: 25,
-              child: Text(name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              left: 0,
+              right: 0,
+              bottom: 70,
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 25),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        ClipOval(
+                          child: Image.asset(
+                            'assets/images/def_photo.png',
+                            width: 70,
+                            height: 70,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              name,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              email,
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
-            // 이메일 등 추가하면서 사진 등 디스플레이 가능...
             Positioned(
               bottom: 0,
+              left: 0,
+              right: 0,
               child: Container(
-                // 네비게이션 버튼 유지...
+                color: Color(0xFF3C72BD),
+                padding: EdgeInsets.symmetric(vertical: 10),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     IconButton(
-                      onPressed: () => Navigator.push(
+                      icon: Image.asset('assets/btns/mypgDis.png', width: 40),
+                      onPressed: () {
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => MySchoolTeachers())),
-                      icon: Image.asset('assets/btns/mypgDis.png', width: 40),
+                            builder: (context) => MySchoolTeachers(),
+                          ),
+                        );
+                      },
                     ),
-                    // ... 나머지 버튼 유지 ...
+                    IconButton(
+                      icon: Image.asset('assets/btns/chatDis.png', width: 40),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => Home()),
+                        );
+                      },
+                    ),
+                    IconButton(
+                      icon: Image.asset('assets/btns/calDis.png', width: 40),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => Calendar()),
+                        );
+                      },
+                    ),
+                    IconButton(
+                      icon: Image.asset('assets/btns/optAct.png', width: 40),
+                      onPressed: () {},
+                    ),
                   ],
                 ),
               ),
