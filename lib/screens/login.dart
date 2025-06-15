@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
+import 'package:qna_frontend/screens/option.dart';
 import 'dart:convert';
 
+import '../models/dto.dart';
 import 'home.dart';
 
 class Login extends StatelessWidget {
@@ -28,10 +30,9 @@ class Login extends StatelessWidget {
       final UserCredential userCredential = await _auth.signInWithCredential(credential);
       final User? user = userCredential.user;
       final idTokenResult = await user?.getIdTokenResult(true);
-      print("userIdToken: + ${idTokenResult?.token}");
 
       final response = await http.post(
-        Uri.parse('http://172.30.1.94:8088/api/login'),
+        Uri.parse('https://qna-messenger.mirim-it-show.site/api/login'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ${idTokenResult?.token}',
@@ -45,18 +46,13 @@ class Login extends StatelessWidget {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         final success = jsonResponse['success'] ?? false;
-        if (jsonResponse['data'] is Map<String, dynamic>) {
-          final Map<String, dynamic> userData = jsonResponse['data'];
-        }
         if (!success) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('로그인 실패')));
           return;
         }
-
-        final userType = jsonResponse['data']['userType'];
-        final isNewUser = jsonResponse['data']['isNewUser'] ?? false;
-
-        if (userType == "TEACHER" && isNewUser) {
+        final userJson = jsonResponse['data'];
+        final userDto = UserDto.fromJson(userJson);
+        if (userDto.usertype == UserType.teacher) {
           await showDialog(
             context: context,
             builder: (context) {
@@ -86,10 +82,10 @@ class Login extends StatelessWidget {
 
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => Home()),
+                        MaterialPageRoute(builder: (context) => Option()),
                       );
                     },
-                    child: Text('제출'),
+                    child: Text('확인'),
                   ),
                 ],
               );
@@ -98,7 +94,7 @@ class Login extends StatelessWidget {
         } else {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => Home()),
+            MaterialPageRoute(builder: (context) => Option()),
           );
         }
       } else if (response.statusCode == 403) {

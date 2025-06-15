@@ -5,6 +5,7 @@ import 'package:qna_frontend/screens/option_stu.dart';
 
 import 'calendar.dart';
 import 'chat.dart';
+import 'option.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -224,7 +225,7 @@ class _HomeState extends State<Home> {
                     IconButton(
                       icon: Image.asset('assets/btns/optDis.png', width: 40, height: 40),
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => Option_stu()));
+                        //Navigator.push(context, MaterialPageRoute(builder: (context) => Option(user:userDto)));
                       },
                     ),
                   ],

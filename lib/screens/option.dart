@@ -1,4 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
+
 import 'package:qna_frontend/models/dto.dart';
 import 'package:qna_frontend/screens/MySchoolTeachers.dart';
 import 'package:qna_frontend/screens/calendar.dart';
@@ -8,23 +12,51 @@ import 'package:qna_frontend/screens/splash.dart';
 import 'chat.dart';
 import 'home.dart';
 
-class OptionScreen extends StatefulWidget {
-  final UserDto user;
-  final TeacherDto? teacher;
-  final List<FaqDto> faqs;
-
-  OptionScreen({required this.user, this.teacher, this.faqs = const []});
+class Option extends StatefulWidget {
+  Option({Key? key}) : super(key: key);
 
   @override
-  _OptionScreenState createState() => _OptionScreenState();
+  _OptionState createState() => _OptionState();
 }
 
-class _OptionScreenState extends State<OptionScreen> {
+class _OptionState extends State<Option> {
+  UserDto? _user;
+  TeacherDto? _teacher;
+  List<FaqDto> _faqs = [];
+
   bool _notificationsEnabled = true;
   bool _calendarNotification = true;
   bool _chatNotification = true;
 
   final TextEditingController _deleteConfirmController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserProfile();
+  }
+
+  Future<void> _fetchUserProfile() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final idToken = await currentUser?.getIdToken();
+
+    final response = await http.get(
+      Uri.parse('https://qna-messenger.mirim-it-show.site/api/user/profile'),
+      headers: {'Authorization': 'Bearer $idToken'},
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body)['data'];
+
+      setState(() {
+        _user = UserDto.fromJson(data);
+        _teacher = data['teacher'] != null ? TeacherDto.fromJson(data['teacher']) : null;
+        _faqs = (data['faqList'] as List?)?.map((e) => FaqDto.fromJson(e)).toList() ?? [];
+      });
+    } else {
+      print('프로필 조회 실패: ${response.statusCode}');
+    }
+  }
 
   @override
   void dispose() {
@@ -33,6 +65,8 @@ class _OptionScreenState extends State<OptionScreen> {
   }
 
   void _showDeleteConfirmPopup() {
+    if (_user == null) return;
+
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -46,7 +80,7 @@ class _OptionScreenState extends State<OptionScreen> {
             Text('- 개인 프로필 설정이 모두 사라집니다.'),
             SizedBox(height: 16),
             Text(
-              '진행하시겠다면 이름 : ${widget.user.name} 을 입력해주세요.',
+              '진행하시겠다면 이름 : ${_user!.name} 을 입력해주세요.',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
@@ -63,7 +97,7 @@ class _OptionScreenState extends State<OptionScreen> {
           ),
           TextButton(
             onPressed: () {
-              if (_deleteConfirmController.text.trim() == widget.user.name) {
+              if (_deleteConfirmController.text.trim() == _user!.name) {
                 Navigator.pop(context);
                 _deleteConfirmController.clear();
                 _showAlertThenMoveToLogin('회원탈퇴를 완료했습니다.');
@@ -87,10 +121,7 @@ class _OptionScreenState extends State<OptionScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => Splash()),
-              );
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => Splash()));
             },
             child: Text('확인'),
           )
@@ -114,10 +145,7 @@ class _OptionScreenState extends State<OptionScreen> {
             child: Text('로그아웃'),
             onPressed: () {
               Navigator.pop(context);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => Login()),
-              );
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => Splash()));
             },
           )
         ],
@@ -142,7 +170,11 @@ class _OptionScreenState extends State<OptionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isTeacher = widget.user.usertype == UserType.teacher;
+    if (_user == null) {
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final isTeacher = _user!.usertype == UserType.teacher;
 
     return Scaffold(
       body: Stack(
@@ -181,7 +213,7 @@ class _OptionScreenState extends State<OptionScreen> {
                     children: [
                       ClipOval(
                         child: Image.network(
-                          widget.user.imgurl.isNotEmpty ? widget.user.imgurl : 'https://via.placeholder.com/70',
+                          _user!.imgurl.isNotEmpty ? _user!.imgurl : 'https://via.placeholder.com/70',
                           width: 70,
                           height: 70,
                           fit: BoxFit.cover,
@@ -191,16 +223,16 @@ class _OptionScreenState extends State<OptionScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('${isTeacher ? '선생님' : '학생'} ${widget.user.name}',
+                          Text('${isTeacher ? '선생님' : '학생'} ${_user!.name}',
                               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                           SizedBox(height: 4),
-                          Text(widget.user.email, style: TextStyle(color: Colors.grey, fontSize: 16)),
+                          Text(_user!.email, style: TextStyle(color: Colors.grey, fontSize: 16)),
                         ],
                       ),
                     ],
                   ),
                   SizedBox(height: 30),
-                  if (isTeacher && widget.teacher != null) ...[
+                  if (isTeacher && _teacher != null) ...[
                     Card(
                       elevation: 2,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -209,9 +241,9 @@ class _OptionScreenState extends State<OptionScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('담당과목 : ${widget.teacher!.subject}', style: TextStyle(fontSize: 18)),
+                            Text('담당과목 : ${_teacher!.subject}', style: TextStyle(fontSize: 18)),
                             SizedBox(height: 15),
-                            Text('교무실 : ${widget.teacher!.office}', style: TextStyle(fontSize: 18)),
+                            Text('교무실 : ${_teacher!.office}', style: TextStyle(fontSize: 18)),
                           ],
                         ),
                       ),
@@ -222,10 +254,12 @@ class _OptionScreenState extends State<OptionScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       child: ExpansionTile(
                         title: Text('자주하는 질문', style: TextStyle(fontSize: 18)),
-                        children: widget.faqs.map((faq) => ListTile(
+                        children: _faqs
+                            .map((faq) => ListTile(
                           title: Text(faq.question),
                           subtitle: Text(faq.answer),
-                        )).toList(),
+                        ))
+                            .toList(),
                       ),
                     ),
                     SizedBox(height: 20),
