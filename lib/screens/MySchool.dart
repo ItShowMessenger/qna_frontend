@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:share_plus/share_plus.dart';
 
 import 'calendar.dart';
 import 'home.dart';
@@ -94,44 +95,56 @@ class _MySchool extends State<MySchool> {
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: _teachers.isEmpty
                   ? Align(
-                alignment: Alignment(0, -0.3), // 중앙보다 위쪽으로 조정
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                    '아직 Q&A에 가입하신 선생님이 없어요!\n아래 버튼으로 초대해보세요!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  ElevatedButton.icon(
-                    onPressed: (){},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF3C72BD),
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
+                  alignment: Alignment(0, -0.3), // 중앙보다 위쪽으로 조정
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '아직 Q&A에 가입하신 선생님이 없어요!\n아래 버튼으로 초대해보세요!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    icon: Image.asset(
-                      'assets/icons/icon_share.png',
-                      width: 20,
-                      height: 20,
-                      color: Colors.white,
-                    ),
-                    label: Text(
-                      '링크 공유하기',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
+                      SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          try {
+                            await Share.share(
+                              'Q&A에 가입해보세요!\n https://github.com/ItShowMessenger',
+                              subject: 'Q&A 선생님 초대',
+                            );
+                          } catch (e) {
+                            print("공유 실패: $e");
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('공유에 실패했습니다.')),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF3C72BD),
+                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                        ),
+                        icon: Image.asset(
+                          'assets/icons/icon_share.png',
+                          width: 20,
+                          height: 20,
+                          color: Colors.white,
+                        ),
+                        label: Text(
+                          '링크 공유하기',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ],
-              )
+                    ],
+                  )
               )
                   : ListView.builder(
                 itemCount: _teachers.length,
@@ -225,7 +238,7 @@ class _MySchool extends State<MySchool> {
                   IconButton(
                     icon: Image.asset('assets/btns/optDis.png', width: 40),
                     onPressed: () {
-                      //Navigator.push(context, MaterialPageRoute(builder: (context) => Option(user: user,)));
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => Option()));
                     },
                   ),
                 ],

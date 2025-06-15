@@ -32,8 +32,27 @@ class _OptionState extends State<Option> {
   @override
   void initState() {
     super.initState();
+    _loadUserFromProvider();
     _fetchUserProfile();
   }
+
+  void _loadUserFromProvider() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    setState(() {
+      _user = userProvider.user;
+
+      // user가 teacher 타입일 때, 별도로 TeacherDto를 받아서 할당해야 함
+      if (_user?.usertype == UserType.teacher) {
+        // 예: userProvider가 teacher 데이터를 따로 가지고 있다고 가정
+        _teacher = userProvider.teacher;  // 혹은 teacher 데이터를 가져오는 함수/변수를 사용
+      } else {
+        _teacher = null;
+      }
+      _faqs = [];
+    });
+  }
+
+
 
   Future<void> _fetchUserProfile() async {
     try {
