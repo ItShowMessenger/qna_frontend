@@ -1,18 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
-import 'package:qna_frontend/screens/option.dart';
-import 'dart:convert';
+import 'package:provider/provider.dart';
 
-import '../models/dto.dart';
+import '../classes/UserProvider.dart';
+import '../models/dto.dart'; // UserProvider import
 import 'home.dart';
 
 class Login extends StatelessWidget {
-  final TextEditingController idController = TextEditingController();
-  final TextEditingController pwController = TextEditingController();
-
-  final  GoogleSignIn _googleSignIn= GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<void> _handleGoogleLogin(BuildContext context) async {
@@ -40,9 +39,6 @@ class Login extends StatelessWidget {
         body: jsonEncode({}),
       );
 
-      print('응답 status code: ${response.statusCode}');
-      print('응답 body: ${response.body}');
-
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         final success = jsonResponse['success'] ?? false;
@@ -52,6 +48,11 @@ class Login extends StatelessWidget {
         }
         final userJson = jsonResponse['data'];
         final userDto = UserDto.fromJson(userJson);
+
+        // 로그인 성공 시 Provider에 저장
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.setUser(userDto);
+
         if (userDto.usertype == UserType.teacher) {
           await showDialog(
             context: context,
@@ -82,7 +83,7 @@ class Login extends StatelessWidget {
 
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => Option()),
+                        MaterialPageRoute(builder: (context) => Home()),
                       );
                     },
                     child: Text('확인'),
@@ -94,7 +95,7 @@ class Login extends StatelessWidget {
         } else {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => Option()),
+            MaterialPageRoute(builder: (context) => Home()),
           );
         }
       } else if (response.statusCode == 403) {
@@ -112,8 +113,8 @@ class Login extends StatelessWidget {
         );
       }
     } catch (e) {
-      print('또 실패구나~: $e');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('에엑따')));
+      print('로그인 실패: $e');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('로그인 중 오류 발생')));
     }
   }
 
