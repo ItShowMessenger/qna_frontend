@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:qna_frontend/services/api_service.dart';
 import 'package:qna_frontend/screens/option_stu.dart';
+
 import 'calendar.dart';
 import 'home.dart';
-import 'profile_stu.dart';
 
 class MySchoolTeachers extends StatefulWidget {
   @override
@@ -11,34 +10,6 @@ class MySchoolTeachers extends StatefulWidget {
 }
 
 class _MySchoolTeachersState extends State<MySchoolTeachers> {
-  TextEditingController _searchController = TextEditingController();
-  List<dynamic> _teachers = [];
-
-  void _search() async {
-    final query = _searchController.text.trim();
-    if (query.isEmpty) return;
-    try {
-      final results = await ApiService.fetchUserList(query: query);
-      setState(() => _teachers = results);
-    } catch (e) {
-      print('검색 오류: $e');
-    }
-  }
-
-  void _openProfile(String userId) async {
-    try {
-      final profile = await ApiService.fetchUserProfile(userId);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => Profile_stu(data: profile),
-        ),
-      );
-    } catch (e) {
-      print('프로필 오류: $e');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,9 +26,9 @@ class _MySchoolTeachersState extends State<MySchoolTeachers> {
               fit: BoxFit.cover,
             ),
           ),
-          // 검색 아이콘
+          // 검색 아이콘 (원래 Positioned가 아니었던 부분을 Positioned로 감쌈)
           Positioned(
-            top: 50,
+            top: 50, // 필요에 따라 위치 조정
             right: 16,
             child: Image.asset(
               'assets/icons/icon_search.png',
@@ -87,16 +58,15 @@ class _MySchoolTeachersState extends State<MySchoolTeachers> {
               ),
             ),
           ),
+
           // 검색창
           Positioned(
-            top: 120,
+            top: 120, // 타이틀 바 아래에 배치 (예시)
             left: 16,
             right: 16,
             child: SizedBox(
               width: double.infinity,
               child: TextField(
-                controller: _searchController,
-                onSubmitted: (_) => _search(),
                 decoration: InputDecoration(
                   hintText: '성함으로 찾기',
                   prefixIcon: Icon(Icons.search),
@@ -108,67 +78,61 @@ class _MySchoolTeachersState extends State<MySchoolTeachers> {
               ),
             ),
           ),
-          // 검색 결과 리스트
+          // 선생님 항목 UI (Padding 대신 Positioned로 배치)
           Positioned(
-            top: 190,
+            top: 190, // 검색창 아래에 배치 (예시)
             left: 16,
             right: 16,
-            bottom: 70,
-            child: SingleChildScrollView(
-              child: Column(
-                children: _teachers.map((teacher) {
-                  return GestureDetector(
-                    onTap: () => _openProfile(teacher['userDto']['userId']),
-                    child: Container(
-                      margin: EdgeInsets.symmetric(vertical: 6),
-                      padding: EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(6),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 4,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundImage:
-                            AssetImage('assets/images/def_photo.png'),
-                            radius: 24,
-                          ),
-                          SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  teacher['userDto']?['name'] ?? '이름 없음',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                                Text(
-                                  teacher['teacherDto']?['subject'] ?? '',
-                                  style:
-                                  TextStyle(color: Colors.grey[800]),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
+            child: Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(6),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    margin: EdgeInsets.only(right: 12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.grey[300],
                     ),
-                  );
-                }).toList(),
+                    child: Image.asset('assets/images/def_photo.png'),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '선생님 이름',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          '담당 과목',
+                          style: TextStyle(color: Colors.grey[900]),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          // 하단 탭바
+          // 하단 탭바 (원래 Container였던 부분도 Positioned로 배치)
           Positioned(
             bottom: 0,
             left: 0,

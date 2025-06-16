@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:qna_frontend/screens/MySchoolTeachers.dart';
-import 'package:qna_frontend/screens/option_stu.dart';
+import 'package:qna_frontend/screens/MySchool.dart';
 
+import '../models/dto.dart';
+import 'MySchool.dart';
 import 'calendar.dart';
 import 'chat.dart';
+import 'option.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -12,6 +14,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final userDto = UserDto.fromJson;
   bool _isSearching = false;
   String _searchText = '';
   FocusNode _focusNode = FocusNode();
@@ -208,7 +211,7 @@ class _HomeState extends State<Home> {
                     IconButton(
                       icon: Image.asset('assets/btns/mypgDis.png', width: 40, height: 40),
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => MySchoolTeachers()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => MySchool()));
                       },
                     ),
                     IconButton(
@@ -224,7 +227,7 @@ class _HomeState extends State<Home> {
                     IconButton(
                       icon: Image.asset('assets/btns/optDis.png', width: 40, height: 40),
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => Option_stu()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => Option()));
                       },
                     ),
                   ],

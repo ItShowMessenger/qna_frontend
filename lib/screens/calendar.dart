@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'home.dart';
-import 'option_stu.dart';
+import 'option.dart';
+import 'mySchool.dart';
 
 class Calendar extends StatefulWidget {
   @override
@@ -190,7 +191,7 @@ class _CalendarState extends State<Calendar> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Option_stu()),
+                        MaterialPageRoute(builder: (context) => Home()),
                       );
                     },
                   ),

@@ -1,30 +1,97 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+
 import 'package:qna_frontend/models/dto.dart';
-import 'package:qna_frontend/screens/MySchoolTeachers.dart';
+import 'package:qna_frontend/screens/MySchool.dart';
 import 'package:qna_frontend/screens/calendar.dart';
 import 'package:qna_frontend/screens/login.dart';
 import 'package:qna_frontend/screens/splash.dart';
-
 import 'chat.dart';
 import 'home.dart';
+import '../classes/UserProvider.dart';
 
-class OptionScreen extends StatefulWidget {
-  final UserDto user;
-  final TeacherDto? teacher;
-  final List<FaqDto> faqs;
-
-  OptionScreen({required this.user, this.teacher, this.faqs = const []});
-
+class Option extends StatefulWidget {
   @override
-  _OptionScreenState createState() => _OptionScreenState();
+  _OptionState createState() => _OptionState();
 }
 
-class _OptionScreenState extends State<OptionScreen> {
+class _OptionState extends State<Option> {
+  UserDto? _user;
+  TeacherDto? _teacher;
+  List<FaqDto> _faqs = [];
+
   bool _notificationsEnabled = true;
   bool _calendarNotification = true;
   bool _chatNotification = true;
 
   final TextEditingController _deleteConfirmController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserFromProvider();
+    _fetchUserProfile();
+  }
+
+  void _loadUserFromProvider() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    setState(() {
+      _user = userProvider.user;
+
+      // user가 teacher 타입일 때, 별도로 TeacherDto를 받아서 할당해야 함
+      if (_user?.usertype == UserType.teacher) {
+        // 예: userProvider가 teacher 데이터를 따로 가지고 있다고 가정
+        _teacher = userProvider.teacher;  // 혹은 teacher 데이터를 가져오는 함수/변수를 사용
+      } else {
+        _teacher = null;
+      }
+      _faqs = [];
+    });
+  }
+
+
+
+  Future<void> _fetchUserProfile() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      final idToken = await currentUser?.getIdToken();
+
+      if (idToken == null) {
+        print('토큰 없음');
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse('https://qna-messenger.mirim-it-show.site/api/user/profile'),
+        headers: {'Authorization': 'Bearer $idToken'},
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final data = responseData['data'];
+
+        final userDto = UserDto.fromJson(data);
+        final teacherDto = data['teacher'] != null ? TeacherDto.fromJson(data['teacher']) : null;
+        final faqList = (data['faqList'] as List?)?.map((e) => FaqDto.fromJson(e)).toList() ?? [];
+
+        setState(() {
+          _user = userDto;
+          _teacher = teacherDto;
+          _faqs = faqList;
+        });
+
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.setUser(userDto);
+      } else {
+        print('프로필 조회 실패: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('프로필 조회 중 오류 발생: $e');
+    }
+  }
 
   @override
   void dispose() {
@@ -33,6 +100,8 @@ class _OptionScreenState extends State<OptionScreen> {
   }
 
   void _showDeleteConfirmPopup() {
+    if (_user == null) return;
+
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -46,7 +115,7 @@ class _OptionScreenState extends State<OptionScreen> {
             Text('- 개인 프로필 설정이 모두 사라집니다.'),
             SizedBox(height: 16),
             Text(
-              '진행하시겠다면 이름 : ${widget.user.name} 을 입력해주세요.',
+              '진행하시겠다면 이름 : ${_user!.name} 을 입력해주세요.',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
@@ -63,7 +132,7 @@ class _OptionScreenState extends State<OptionScreen> {
           ),
           TextButton(
             onPressed: () {
-              if (_deleteConfirmController.text.trim() == widget.user.name) {
+              if (_deleteConfirmController.text.trim() == _user!.name) {
                 Navigator.pop(context);
                 _deleteConfirmController.clear();
                 _showAlertThenMoveToLogin('회원탈퇴를 완료했습니다.');
@@ -87,10 +156,7 @@ class _OptionScreenState extends State<OptionScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => Splash()),
-              );
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => Splash()));
             },
             child: Text('확인'),
           )
@@ -114,10 +180,7 @@ class _OptionScreenState extends State<OptionScreen> {
             child: Text('로그아웃'),
             onPressed: () {
               Navigator.pop(context);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => Login()),
-              );
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => Splash()));
             },
           )
         ],
@@ -142,9 +205,14 @@ class _OptionScreenState extends State<OptionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isTeacher = widget.user.usertype == UserType.teacher;
+    if (_user == null) {
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final isTeacher = _user!.usertype == UserType.teacher;
 
     return Scaffold(
+      backgroundColor: Colors.white,  // 배경색 명시적으로 화이트 지정
       body: Stack(
         children: [
           Positioned(
@@ -171,7 +239,7 @@ class _OptionScreenState extends State<OptionScreen> {
             top: 140,
             left: 0,
             right: 0,
-            bottom: 70,
+            bottom: 70,  // 네비게이션 바와 겹치지 않도록 공간 확보
             child: SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: 25),
               child: Column(
@@ -181,7 +249,7 @@ class _OptionScreenState extends State<OptionScreen> {
                     children: [
                       ClipOval(
                         child: Image.network(
-                          widget.user.imgurl.isNotEmpty ? widget.user.imgurl : 'https://via.placeholder.com/70',
+                          _user!.imgurl.isNotEmpty ? _user!.imgurl : 'https://via.placeholder.com/70',
                           width: 70,
                           height: 70,
                           fit: BoxFit.cover,
@@ -191,16 +259,17 @@ class _OptionScreenState extends State<OptionScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('${isTeacher ? '선생님' : '학생'} ${widget.user.name}',
+                          Text('${isTeacher ? '선생님' : '학생'} ${_user!.name}',
                               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                           SizedBox(height: 4),
-                          Text(widget.user.email, style: TextStyle(color: Colors.grey, fontSize: 16)),
+                          Text(_user!.email, style: TextStyle(color: Colors.grey, fontSize: 16)),
                         ],
                       ),
                     ],
                   ),
                   SizedBox(height: 30),
-                  if (isTeacher && widget.teacher != null) ...[
+
+                  if (isTeacher && _teacher != null) ...[
                     Card(
                       elevation: 2,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -209,9 +278,9 @@ class _OptionScreenState extends State<OptionScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('담당과목 : ${widget.teacher!.subject}', style: TextStyle(fontSize: 18)),
+                            Text('담당과목 : ${_teacher!.subject}', style: TextStyle(fontSize: 18)),
                             SizedBox(height: 15),
-                            Text('교무실 : ${widget.teacher!.office}', style: TextStyle(fontSize: 18)),
+                            Text('교무실 : ${_teacher!.office}', style: TextStyle(fontSize: 18)),
                           ],
                         ),
                       ),
@@ -222,14 +291,18 @@ class _OptionScreenState extends State<OptionScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       child: ExpansionTile(
                         title: Text('자주하는 질문', style: TextStyle(fontSize: 18)),
-                        children: widget.faqs.map((faq) => ListTile(
+                        children: _faqs
+                            .map((faq) => ListTile(
                           title: Text(faq.question),
                           subtitle: Text(faq.answer),
-                        )).toList(),
+                        ))
+                            .toList(),
                       ),
                     ),
                     SizedBox(height: 20),
                   ],
+
+                  // 알림 설정 카드
                   Card(
                     elevation: 2,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -241,7 +314,7 @@ class _OptionScreenState extends State<OptionScreen> {
                             title: Text('전체 알림 설정', style: TextStyle(fontSize: 18)),
                             trailing: Switch(
                               value: _notificationsEnabled,
-                              activeColor: Color(0xFF566B92),
+                              activeColor: Color(0xFF566B92), // 전체 알림 버튼 색 유지
                               onChanged: (bool value) {
                                 setState(() {
                                   _notificationsEnabled = value;
@@ -276,7 +349,10 @@ class _OptionScreenState extends State<OptionScreen> {
                       ),
                     ),
                   ),
+
                   SizedBox(height: 20),
+
+                  // 로그아웃 카드 (담당과목 / 교무실 카드 스타일과 동일)
                   Card(
                     elevation: 2,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -285,6 +361,7 @@ class _OptionScreenState extends State<OptionScreen> {
                       onTap: _showLogoutConfirmPopup,
                     ),
                   ),
+
                   Center(
                     child: TextButton(
                       onPressed: _showDeleteConfirmPopup,
@@ -295,6 +372,8 @@ class _OptionScreenState extends State<OptionScreen> {
               ),
             ),
           ),
+
+          // 하단 내비게이션 바 유지
           Positioned(
             bottom: 0,
             left: 0,
@@ -307,7 +386,7 @@ class _OptionScreenState extends State<OptionScreen> {
                 children: [
                   IconButton(
                     icon: Image.asset('assets/btns/mypgDis.png', width: 40),
-                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MySchoolTeachers())),
+                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MySchool())),
                   ),
                   IconButton(
                     icon: Image.asset('assets/btns/chatDis.png', width: 40),
