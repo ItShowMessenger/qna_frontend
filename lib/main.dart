@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:qna_frontend/screens/chat.dart';
 import 'package:qna_frontend/screens/home.dart';
 import 'package:qna_frontend/screens/login.dart';
+import 'package:qna_frontend/screens/profile.dart';
 import 'package:qna_frontend/screens/splash.dart';
 import 'package:qna_frontend/classes/UserProvider.dart';
 import 'package:qna_frontend/classes/mySchoolProvider.dart';

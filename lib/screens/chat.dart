@@ -100,7 +100,7 @@ class _ChatState extends State<Chat> {
                   Expanded(
                     child: Center(
                       child: Text(
-                        '6학년 6반 미림선생님',
+                        '3학년 2반 김영철 선생님',
                         style: TextStyle(color: Colors.white, fontSize: 18),
                       ),
                     ),
