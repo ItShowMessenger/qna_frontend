@@ -78,7 +78,8 @@ class Profile extends StatelessWidget {
                       Card(
                         elevation: 2,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        child: Padding(
+                        child: Container(
+                          width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,13 +95,19 @@ class Profile extends StatelessWidget {
                       Card(
                         elevation: 2,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        child: ListTile(
-                          title: Text('자주하는 질문', style: TextStyle(fontSize: 18)),
-                          onTap: () {
-                            // TODO: Add FAQ navigation
-                          },
+                        child: Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(horizontal: 0), // Card 내부 padding 제거
+                          child: ListTile(
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16), // 여기서 padding 직접 지정
+                            title: Text('자주하는 질문', style: TextStyle(fontSize: 18)),
+                            onTap: () {
+                              // TODO: Add FAQ navigation
+                            },
+                          ),
                         ),
                       ),
+
                     ],
                   ],
                 ),
