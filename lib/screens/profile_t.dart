@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qna_frontend/screens/MySchoolTeachers.dart';
+import 'package:qna_frontend/screens/MySchool.dart';
 import 'package:qna_frontend/screens/calendar.dart';
 import 'package:qna_frontend/screens/chat.dart';
 import 'package:qna_frontend/screens/home.dart';
@@ -154,7 +154,7 @@ class _Profile_tState extends State<Profile_t> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => MySchoolTeachers()),
+                          MaterialPageRoute(builder: (context) => MySchool()),
                         );
                       },
                     ),

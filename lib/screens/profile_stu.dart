@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:qna_frontend/screens/MySchoolTeachers.dart';
+import 'package:qna_frontend/screens/MySchool.dart';
 import 'package:qna_frontend/screens/calendar.dart';
 import 'package:qna_frontend/screens/login.dart';
+import 'MySchool.dart';
 import 'chat.dart';
 import 'home.dart';
 
@@ -113,7 +114,7 @@ class _Profile_stuState extends State<Profile_stu> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => MySchoolTeachers(),
+                            builder: (context) => MySchool(),
                           ),
                         );
                       },

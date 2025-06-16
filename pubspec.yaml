@@ -32,10 +32,11 @@ dependencies:
     sdk: flutter
   intl: ^0.18.1
   google_sign_in: ^6.0.0
-  firebase_auth: ^4.0.0
-  firebase_core: ^2.0.0
+  firebase_auth: ^4.17.7
+  firebase_core: ^2.26.0
   table_calendar: ^3.0.9
-  flutter_secure_storage: ^9.0.0
+  provider: ^6.0.5
+  share_plus: ^7.2.1
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -45,8 +46,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -84,6 +83,7 @@ flutter:
     - assets/icons/icon_back.png
     - assets/icons/icon_plusFile.png
     - assets/icons/icon_input.png
+    - assets/icons/icon_share.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

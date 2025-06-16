@@ -259,7 +259,7 @@ class _OptionState extends State<Option> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('${isTeacher ? '선생님' : '학생'} ${_user!.name}',
+                          Text( '${_user!.name} ${isTeacher ? '선생님' : '학생'}',
                               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                           SizedBox(height: 4),
                           Text(_user!.email, style: TextStyle(color: Colors.grey, fontSize: 16)),
