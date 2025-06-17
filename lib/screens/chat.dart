@@ -22,13 +22,13 @@ class ChatMessage {
 
 class _ChatState extends State<Chat> {
   final TextEditingController _myController = TextEditingController();
+  final TextEditingController _otherController = TextEditingController();
   final List<ChatMessage> _messages = [];
   final ScrollController _scrollController = ScrollController();
-  bool showAttachment = false;
 
   void _sendMessage({required bool isMe}) {
-    final controller = isMe ? _myController : null;
-    final text = controller?.text.trim() ?? '';
+    final controller = isMe ? _myController : _otherController;
+    final text = controller.text.trim();
     if (text.isEmpty) return;
 
     setState(() {
@@ -38,7 +38,7 @@ class _ChatState extends State<Chat> {
         isMe: isMe,
         isRead: !isMe,
       ));
-      controller?.clear();
+      controller.clear();
     });
 
     // 자동 스크롤
@@ -56,11 +56,11 @@ class _ChatState extends State<Chat> {
   @override
   Widget build(BuildContext context) {
     final DateTime now = DateTime.now();
+    bool showAttachment = false;
     final String todayDate =
         '${now.year % 100}.${now.month.toString().padLeft(2, '0')}.${now.day.toString().padLeft(2, '0')}';
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Stack(
         children: [
           // 상단 네비 이미지
@@ -100,7 +100,7 @@ class _ChatState extends State<Chat> {
                   Expanded(
                     child: Center(
                       child: Text(
-                        'OOO 선생님',
+                        '6학년 6반 미림선생님',
                         style: TextStyle(color: Colors.white, fontSize: 18),
                       ),
                     ),
@@ -140,14 +140,12 @@ class _ChatState extends State<Chat> {
                     '${msg.time.hour.toString().padLeft(2, '0')}:${msg.time.minute.toString().padLeft(2, '0')}';
 
                 return Align(
-                  alignment:
-                  msg.isMe ? Alignment.centerRight : Alignment.centerLeft,
+                  alignment: msg.isMe ? Alignment.centerRight : Alignment.centerLeft,
                   child: Container(
                     margin: EdgeInsets.symmetric(vertical: 6),
                     child: Column(
-                      crossAxisAlignment: msg.isMe
-                          ? CrossAxisAlignment.end
-                          : CrossAxisAlignment.start,
+                      crossAxisAlignment:
+                      msg.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                       children: [
                         Row(
                           mainAxisAlignment: msg.isMe
@@ -156,92 +154,64 @@ class _ChatState extends State<Chat> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             if (!msg.isMe) ...[
-                              // 상대방 말풍선
                               Container(
-                                padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                margin: EdgeInsets.only(
-                                  left: msg.isMe ? 50 : 0,
-                                  right: msg.isMe ? 0 : 50,
-                                  top: 4,
-                                  bottom: 4,
-                                ),
-                                constraints: BoxConstraints(
-                                  maxWidth: MediaQuery.of(context).size.width * 0.7,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: msg.isMe ? Color(0xFF3C72BD) : Color(0xFFF0F0F0),
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(18),
-                                    topRight: Radius.circular(18),
-                                    bottomLeft:
-                                    Radius.circular(msg.isMe ? 18 : 0), // 본인이면 왼쪽도 둥글게
-                                    bottomRight:
-                                    Radius.circular(msg.isMe ? 0 : 18), // 상대방이면 오른쪽 둥글게
-                                  ),
-                                ),
-                                child: Text(
-                                  msg.text,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: msg.isMe ? Colors.white : Colors.black87,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 4),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    time,
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.black45),
-                                  ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    msg.isRead ? '확인됨' : '확인안됨',
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.black45),
-                                  ),
-                                ],
-                              ),
-                            ],
-                            if (msg.isMe) ...[
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    time,
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.black45),
-                                  ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    msg.isRead ? '확인됨' : '확인안됨',
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.black45),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(width: 4),
-                              // 내 말풍선
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 10),
-                                margin: EdgeInsets.only(left: 4),
+                                padding: EdgeInsets.all(12),
                                 constraints: BoxConstraints(
                                   maxWidth:
-                                  MediaQuery.of(context).size.width * 0.6,
+                                  MediaQuery.of(context).size.width * 0.7,
                                 ),
                                 decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: AssetImage('assets/images/my.png'),
-                                    fit: BoxFit.fill,
+                                  color: Colors.white,
+                                  border: Border.all(color: Color(0xFFCCCCCC)),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  msg.text,
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                            ],
+                            if (msg.isMe)
+                              SizedBox(width: 8),
+                            Column(
+                              crossAxisAlignment: msg.isMe
+                                  ? CrossAxisAlignment.end
+                                  : CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  time,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black45,
                                   ),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  msg.isRead ? '확인됨' : '확인안됨',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black45,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (msg.isMe) ...[
+                              SizedBox(width: 8),
+                              Container(
+                                padding: EdgeInsets.all(12),
+                                constraints: BoxConstraints(
+                                  maxWidth:
+                                  MediaQuery.of(context).size.width * 0.7,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFF3C72BD),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
                                   msg.text,
                                   style: TextStyle(
-                                      fontSize: 16, color: Colors.white),
+                                      color: Colors.white, fontSize: 16),
                                 ),
                               ),
                             ],
@@ -255,7 +225,41 @@ class _ChatState extends State<Chat> {
             ),
           ),
 
-          // 하단 입력창
+          // 하단 입력창 2개
+          Positioned(
+            bottom: 70,
+            left: 0,
+            right: 0,
+            child: Container(
+              color: Colors.grey[100],
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _otherController,
+                      decoration: InputDecoration(
+                        hintText: '상대방 메시지 입력',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  IconButton(
+                    icon: Icon(Icons.send, color: Colors.blue),
+                    onPressed: () => _sendMessage(isMe: false),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
           Positioned(
             bottom: 0,
             left: 0,
@@ -286,8 +290,10 @@ class _ChatState extends State<Chat> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        contentPadding:
-                        EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
                       ),
                     ),
                   ),
@@ -299,45 +305,44 @@ class _ChatState extends State<Chat> {
                     ),
                     onPressed: () => _sendMessage(isMe: true),
                   ),
+                  if (showAttachment)
+                    Positioned(
+                      bottom: 130,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 12),
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 10,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            //_attachmentButton(icon: Icons.photo, label: "사진"),
+                            //_attachmentButton(icon: Icons.insert_drive_file, label: "파일"),
+                            //_attachmentButton(icon: Icons.audiotrack, label: "오디오"),
+                            //_attachmentButton(icon: Icons.calendar_today, label: "일정"),
+                          ],
+                        ),
+                      ),
+                    ),
+
                 ],
               ),
             ),
           ),
-
-          // 첨부파일 영역 (showAttachment 상태에 따라)
-          if (showAttachment)
-            Positioned(
-              bottom: 130,
-              left: 0,
-              right: 0,
-              child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 12),
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 10,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    // 첨부 버튼들 자리
-                    //_attachmentButton(icon: Icons.photo, label: "사진"),
-                    //_attachmentButton(icon: Icons.insert_drive_file, label: "파일"),
-                    //_attachmentButton(icon: Icons.audiotrack, label: "오디오"),
-                    //_attachmentButton(icon: Icons.calendar_today, label: "일정"),
-                  ],
-                ),
-              ),
-            ),
         ],
       ),
     );
   }
 }
+

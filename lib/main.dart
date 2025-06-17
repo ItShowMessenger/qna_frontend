@@ -5,11 +5,10 @@ import 'package:provider/provider.dart';
 import 'package:qna_frontend/screens/chat.dart';
 import 'package:qna_frontend/screens/home.dart';
 import 'package:qna_frontend/screens/login.dart';
+import 'package:qna_frontend/screens/option.dart';
 import 'package:qna_frontend/screens/splash.dart';
 import 'package:qna_frontend/classes/UserProvider.dart';
 import 'package:qna_frontend/classes/mySchoolProvider.dart';
-
-import 'classes/chat_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +18,6 @@ Future<void> main() async {
       MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => MySchoolProvider()),
-          ChangeNotifierProvider(create: (_) => ChatProvider()),
         ],
         child: QAApp(),
       ),

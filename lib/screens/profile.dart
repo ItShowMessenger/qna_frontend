@@ -1,26 +1,16 @@
-import 'dart:developer';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
-import 'package:qna_frontend/classes/UserProvider.dart';
 import 'package:qna_frontend/screens/MySchool.dart';
 import 'package:qna_frontend/screens/calendar.dart';
 import 'package:qna_frontend/screens/chat.dart';
 import 'package:qna_frontend/screens/home.dart';
-import 'package:qna_frontend/screens/option.dart';
 
 class Profile extends StatelessWidget {
-  final String userType;
   final dynamic data;
-
 
   const Profile({required this.userType, required this.data});
 
   @override
   Widget build(BuildContext context) {
-    final isTeacher = userType == 'TEACHER';
     final name = data['userDto']?['name'] ?? '이름 없음';
     final email = data['userDto']?['email'] ?? '이메일 없음';
     final subject = data['teacherDto']?['subject'] ?? '';
@@ -29,7 +19,6 @@ class Profile extends StatelessWidget {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        backgroundColor: Colors.white,
         body: Stack(
           children: [
             Positioned(
@@ -42,39 +31,12 @@ class Profile extends StatelessWidget {
               child: Container(
                 height: 60,
                 color: Color(0xFF3C72BD),
-                padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-    child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-    // 🔙 뒤로가기 버튼
-    IconButton(
-    icon: Icon(Icons.arrow_back, color: Colors.white),
-    onPressed: () {
-    Navigator.pop(context);
-    },
-    ),
-
-    // 프로필 텍스트 (가운데)
-    Expanded(
-    child: Center(
     child: Text(
     '프로필',
     style: TextStyle(color: Colors.white, fontSize: 23),
     ),
     ),
     ),
-
-    // 오른쪽 공간 확보용 (좌우 균형 맞추기용)
-    Opacity(
-    opacity: 0,
-    child: IconButton(
-    icon: Icon(Icons.arrow_back),
-    onPressed: null,
-    ),
-    ),
-    ],
-    ),
-              ),
             ),
             Positioned(
               top: 140, left: 0, right: 0, bottom: 70,
@@ -143,64 +105,6 @@ class Profile extends StatelessWidget {
                       ),
 
                     ],
-                    if (isTeacher==false) ...[
-                      SizedBox(height: 30),
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            final currentUser = FirebaseAuth.instance.currentUser;
-                            final idToken = await currentUser?.getIdToken();
-                            final studentId = data['userDto']?['userid'];
-                            final teacherId = Provider.of<UserProvider>(context, listen: false).user?.userid;
-
-                            if (studentId == null || teacherId == null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('학생 또는 선생님의 ID가 없습니다.'))
-                              );
-                              return;
-                            }
-
-                            final roomId = '${studentId}_${teacherId}';
-                            final url = 'https://qna-messenger.mirim-it-show.site/api/chat/$roomId';
-
-                            try {
-                              final response = await http.get(
-                                Uri.parse(url),
-                                headers: {'Authorization': 'Bearer $idToken'},
-                              );
-
-                              if (response.statusCode == 200) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Home(),
-                                  ),
-                                );
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('채팅방 생성 실패 (${response.statusCode}) (${roomId})')),
-                                );
-                              }
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('네트워크 오류: $e')),
-                              );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF3C72BD),
-                            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: Text(
-                            '채팅 하기',
-                            style: TextStyle(fontSize: 16, color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ],
                   ],
                 ),
               ),
@@ -215,7 +119,6 @@ class Profile extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     IconButton(
-                      icon: Image.asset('assets/btns/mypgAct.png', width: 40),
                       onPressed: () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => MySchool()));
                       },
@@ -233,9 +136,7 @@ class Profile extends StatelessWidget {
                       },
                     ),
                     IconButton(
-                      icon: Image.asset('assets/btns/optDis.png', width: 40),
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => Option()));
                       },
                     ),
                   ],
