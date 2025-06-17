@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -41,6 +42,7 @@ class Login extends StatelessWidget {
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
+        print(jsonResponse);
         final success = jsonResponse['success'] ?? false;
         if (!success) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('로그인 실패')));
@@ -53,45 +55,138 @@ class Login extends StatelessWidget {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
         userProvider.setUser(userDto);
 
-        if (userDto.usertype == UserType.teacher) {
+        if (jsonResponse['message']=="회원가입 성공") {
           await showDialog(
             context: context,
             builder: (context) {
               final TextEditingController officeController = TextEditingController();
               final TextEditingController subjectController = TextEditingController();
+              final TextEditingController questionController = TextEditingController();
+              final TextEditingController answerController = TextEditingController();
+              List<Map<String, String>> faqs = [];
 
-              return AlertDialog(
-                title: Text('선생님 정보 입력'),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: officeController,
-                      decoration: InputDecoration(labelText: '교무실 위치'),
+              return StatefulBuilder(
+                builder: (context, setState) {
+                  return AlertDialog(
+                    title: Text('선생님 정보 입력'),
+                    content: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextField(
+                            controller: officeController,
+                            decoration: InputDecoration(labelText: '교무실 위치'),
+                          ),
+                          TextField(
+                            controller: subjectController,
+                            decoration: InputDecoration(labelText: '담당 과목'),
+                          ),
+                          SizedBox(height: 20),
+                          TextField(
+                            controller: questionController,
+                            decoration: InputDecoration(labelText: '자주 묻는 질문'),
+                          ),
+                          TextField(
+                            controller: answerController,
+                            decoration: InputDecoration(
+                              labelText: '답변',
+                              suffixIcon: IconButton(
+                                icon: Icon(Icons.add),
+                                onPressed: () {
+                                  final q = questionController.text.trim();
+                                  final a = answerController.text.trim();
+                                  if (q.isNotEmpty && a.isNotEmpty) {
+                                    setState(() {
+                                      faqs.add({'question': q, 'answer': a} as Map<String, String>);
+                                      questionController.clear();
+                                      answerController.clear();
+                                    });
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Container(
+                            height: 100,
+                            width: MediaQuery.of(context).size.width,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: faqs.length,
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: Chip(
+                                    label: Text(faqs[index]['question'] ?? ''),
+                                    deleteIcon: Icon(Icons.close),
+                                    onDeleted: () {
+                                      setState(() {
+                                        faqs.removeAt(index);
+                                      });
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    TextField(
-                      controller: subjectController,
-                      decoration: InputDecoration(labelText: '담당 과목'),
-                    ),
-                  ],
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () async {
-                      // TODO: 서버에 추가 정보 전송 API가 있다면 여기에 요청
-                      Navigator.of(context).pop();
+                    actions: [
+                      TextButton(
+                        onPressed: () async {
+                          final office = officeController.text.trim();
+                          final subject = subjectController.text.trim();
 
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => Home()),
-                      );
-                    },
-                    child: Text('확인'),
-                  ),
-                ],
+                          if (office.isEmpty || subject.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('모든 정보를 입력해주세요.')),
+                            );
+                            return;
+                          }
+
+
+                          final profileResponse = await http.post(
+                            Uri.parse('https://qna-messenger.mirim-it-show.site/api/teacher/profile'),
+                            headers: {
+                              'Content-Type': 'application/json',
+                              'Authorization': 'Bearer ${idTokenResult?.token}',
+                            },
+                            body: jsonEncode({
+                              'teacher': {
+                                'teacherid': userDto.userid, // ❗ 꼭 있어야 함
+                                'subject': subject,
+                                'office': office,
+                              },
+                               'faq': faqs,
+                            }),
+                          );
+                          if (profileResponse.statusCode == 200) {
+                            Navigator.of(context).pop();
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => Home()),
+                            );
+                          } else {
+                            print('로그인 실패: ${profileResponse.body}');
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('프로필 저장 실패 ${profileResponse.statusCode}')),
+                            );
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => Home()),
+                            );
+                          }
+                        },
+                        child: Text('확인'),
+                      ),
+                    ],
+                  );
+                },
               );
             },
           );
+
         } else {
           Navigator.pushReplacement(
             context,
