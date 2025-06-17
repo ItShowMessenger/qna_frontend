@@ -172,7 +172,12 @@ class _CalendarState extends State<Calendar> {
                 children: [
                   IconButton(
                     icon: Image.asset('assets/btns/mypgDis.png', width: 40),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => MySchool()),
+                      );
+                    },
                   ),
                   IconButton(
                     icon: Image.asset('assets/btns/chatDis.png', width: 40),
@@ -192,7 +197,7 @@ class _CalendarState extends State<Calendar> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Home()),
+                        MaterialPageRoute(builder: (context) => Option()),
                       );
                     },
                   ),

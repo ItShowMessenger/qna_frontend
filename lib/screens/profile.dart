@@ -9,6 +9,7 @@ import 'package:qna_frontend/screens/MySchool.dart';
 import 'package:qna_frontend/screens/calendar.dart';
 import 'package:qna_frontend/screens/chat.dart';
 import 'package:qna_frontend/screens/home.dart';
+import 'package:qna_frontend/screens/option.dart';
 
 class Profile extends StatelessWidget {
   final String userType;
@@ -41,14 +42,38 @@ class Profile extends StatelessWidget {
               child: Container(
                 height: 60,
                 color: Color(0xFF3C72BD),
-                padding: EdgeInsets.fromLTRB(25, 8, 25, 0),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    '프로필',
-                    style: TextStyle(color: Colors.white, fontSize: 23),
-                  ),
-                ),
+                padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+    child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+    // 🔙 뒤로가기 버튼
+    IconButton(
+    icon: Icon(Icons.arrow_back, color: Colors.white),
+    onPressed: () {
+    Navigator.pop(context);
+    },
+    ),
+
+    // 프로필 텍스트 (가운데)
+    Expanded(
+    child: Center(
+    child: Text(
+    '프로필',
+    style: TextStyle(color: Colors.white, fontSize: 23),
+    ),
+    ),
+    ),
+
+    // 오른쪽 공간 확보용 (좌우 균형 맞추기용)
+    Opacity(
+    opacity: 0,
+    child: IconButton(
+    icon: Icon(Icons.arrow_back),
+    onPressed: null,
+    ),
+    ),
+    ],
+    ),
               ),
             ),
             Positioned(
@@ -170,7 +195,7 @@ class Profile extends StatelessWidget {
                             ),
                           ),
                           child: Text(
-                            '채팅 추가하기',
+                            '채팅 하기',
                             style: TextStyle(fontSize: 16, color: Colors.white),
                           ),
                         ),
@@ -190,7 +215,7 @@ class Profile extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     IconButton(
-                      icon: Image.asset('assets/btns/mypgDis.png', width: 40),
+                      icon: Image.asset('assets/btns/mypgAct.png', width: 40),
                       onPressed: () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => MySchool()));
                       },
@@ -208,9 +233,9 @@ class Profile extends StatelessWidget {
                       },
                     ),
                     IconButton(
-                      icon: Image.asset('assets/btns/optAct.png', width: 40),
+                      icon: Image.asset('assets/btns/optDis.png', width: 40),
                       onPressed: () {
-                        // 현재 페이지
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => Option()));
                       },
                     ),
                   ],
