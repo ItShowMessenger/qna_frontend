@@ -9,6 +9,8 @@ import 'package:qna_frontend/screens/splash.dart';
 import 'package:qna_frontend/classes/UserProvider.dart';
 import 'package:qna_frontend/classes/mySchoolProvider.dart';
 
+import 'classes/chat_provider.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
@@ -17,6 +19,7 @@ Future<void> main() async {
       MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => MySchoolProvider()),
+          ChangeNotifierProvider(create: (_) => ChatProvider()),
         ],
         child: QAApp(),
       ),

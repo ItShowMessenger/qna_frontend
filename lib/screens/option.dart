@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:qna_frontend/models/dto.dart';
 import 'package:qna_frontend/screens/MySchool.dart';
@@ -178,9 +179,23 @@ class _OptionState extends State<Option> {
           ),
           TextButton(
             child: Text('로그아웃'),
-            onPressed: () {
+            onPressed: () async {
+              final googleSignIn = GoogleSignIn();
               Navigator.pop(context);
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => Splash()));
+
+              try {
+                await googleSignIn.disconnect();  // ✅ await 가능
+                await googleSignIn.signOut();
+              } catch (e) {
+                print('Google 로그아웃 중 오류: $e');
+              }
+
+              await FirebaseAuth.instance.signOut(); // ✅ Firebase 로그아웃 추가 (필수)
+
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => Splash()),
+              );
             },
           )
         ],
@@ -259,7 +274,7 @@ class _OptionState extends State<Option> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('${isTeacher ? '선생님' : '학생'} ${_user!.name}',
+                          Text( '${_user!.name} ${isTeacher ? '선생님' : '학생'}',
                               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                           SizedBox(height: 4),
                           Text(_user!.email, style: TextStyle(color: Colors.grey, fontSize: 16)),
