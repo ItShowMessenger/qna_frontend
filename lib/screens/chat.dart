@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home.dart';
 
+
 class Chat extends StatefulWidget {
   @override
   _ChatState createState() => _ChatState();
@@ -226,39 +227,39 @@ class _ChatState extends State<Chat> {
           ),
 
           // 하단 입력창 2개
-          Positioned(
-            bottom: 70,
-            left: 0,
-            right: 0,
-            child: Container(
-              color: Colors.grey[100],
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _otherController,
-                      decoration: InputDecoration(
-                        hintText: '상대방 메시지 입력',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 12,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  IconButton(
-                    icon: Icon(Icons.send, color: Colors.blue),
-                    onPressed: () => _sendMessage(isMe: false),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          // Positioned(
+          //   bottom: 70,
+          //   left: 0,
+          //   right: 0,
+          //   child: Container(
+          //     color: Colors.grey[100],
+          //     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          //     child: Row(
+          //       children: [
+          //         Expanded(
+          //           child: TextField(
+          //             controller: _otherController,
+          //             decoration: InputDecoration(
+          //               hintText: '상대방 메시지 입력',
+          //               border: OutlineInputBorder(
+          //                 borderRadius: BorderRadius.circular(20),
+          //               ),
+          //               contentPadding: EdgeInsets.symmetric(
+          //                 horizontal: 14,
+          //                 vertical: 12,
+          //               ),
+          //             ),
+          //           ),
+          //         ),
+          //         SizedBox(width: 8),
+          //         IconButton(
+          //           icon: Icon(Icons.send, color: Colors.blue),
+          //           onPressed: () => _sendMessage(isMe: false),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
 
           Positioned(
             bottom: 0,
