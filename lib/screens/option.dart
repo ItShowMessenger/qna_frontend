@@ -72,16 +72,22 @@ class _OptionState extends State<Option> {
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
+        print(responseData);
         final data = responseData['data'];
 
-        final userDto = UserDto.fromJson(data);
+        final userDto = UserDto.fromJson(data['user']);
         final teacherDto = data['teacher'] != null ? TeacherDto.fromJson(data['teacher']) : null;
         final faqList = (data['faqList'] as List?)?.map((e) => FaqDto.fromJson(e)).toList() ?? [];
+        final alarmSettingDto = AlarmSettingDto.fromJson(data['alarm']);
 
         setState(() {
           _user = userDto;
           _teacher = teacherDto;
           _faqs = faqList;
+
+          _notificationsEnabled = alarmSettingDto.alarm;
+          _calendarNotification = alarmSettingDto.schedule;
+          _chatNotification = alarmSettingDto.chat;
         });
 
         final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -288,7 +294,8 @@ class _OptionState extends State<Option> {
                     Card(
                       elevation: 2,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      child: Padding(
+                      child: Container(
+                        width: double.infinity,
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
