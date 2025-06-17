@@ -137,14 +137,14 @@ class _MySchool extends State<MySchool> {
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: _filteredUsers.isEmpty
                   ? Align(
-                alignment: Alignment(0, -0.3),
+                alignment: Alignment(0, -0.15),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       isTeacher
-                          ? '아직 Q&A에 가입한 학생이 없어요!\n아래 버튼으로 초대해보세요!'
-                          : '아직 Q&A에 가입하신 선생님이 없어요!\n아래 버튼으로 초대해보세요!',
+                          ? '학생이 없습니다.'
+                          : '선생님이 없습니다.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 18,
@@ -152,42 +152,6 @@ class _MySchool extends State<MySchool> {
                       ),
                     ),
                     SizedBox(height: 20),
-                    if (!isTeacher)
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          try {
-                            await Share.share(
-                              'Q&A에 가입해보세요!\n https://github.com/ItShowMessenger',
-                              subject: 'Q&A 선생님 초대',
-                            );
-                          } catch (e) {
-                            print("공유 실패: $e");
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('공유에 실패했습니다.')),
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF3C72BD),
-                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                        icon: Image.asset(
-                          'assets/icons/icon_share.png',
-                          width: 20,
-                          height: 20,
-                          color: Colors.white,
-                        ),
-                        label: Text(
-                          '링크 공유하기',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
                   ],
                 ),
               )

@@ -55,12 +55,14 @@ class _HomeState extends State<Home> {
     await _loadRooms();
   }
 
+
+
   Future<void> _loadRooms() async {
     final currentUser = FirebaseAuth.instance.currentUser;
     final idToken = await currentUser?.getIdToken();
     try {
       final url = Uri.parse(
-          'https://qna-messenger.mirim-it-show.site/api/chat/search?search=$_search');
+          'https://qna-messenger.mirim-it-show.site/api/chat/search?search=${Uri.encodeComponent(_search)}');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $idToken'},
@@ -78,6 +80,7 @@ class _HomeState extends State<Home> {
         final RoomId = decoded['data'][0]['room']?['roomid'];
         final theyId = getTheyId(RoomId, myId!);
         final _unreadCount = decoded['unread'] ?? 0;
+
 
         setState(() {
           _teacherId = theyId;
@@ -164,10 +167,6 @@ class _HomeState extends State<Home> {
                   child: _isSearching
                       ? TextField(
                     focusNode: _focusNode,
-                    onChanged: (value) {
-                      setState(() => _search = value);
-                      _loadRooms();
-                    },
                     style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       hintText: '채팅방 검색',
@@ -195,12 +194,12 @@ class _HomeState extends State<Home> {
                 child: TextField(
                   onChanged: (text) {
                     setState(() {
-                      _search = text;
+                      _search = text; // 검색어 상태 업데이트
                     });
-                    _loadRooms(); // 검색 시 채팅방 필터링
+                    _loadRooms(); // 검색어 반영하여 방 목록 재로드
                   },
                   decoration: InputDecoration(
-                    hintText: _user?.usertype == UserType.teacher  ? '학생 찾기' : '선생님 찾기',
+                    hintText: _user?.usertype == UserType.teacher ? '학생 찾기' : '선생님 찾기',
                     prefixIcon: Icon(Icons.search),
                     contentPadding: EdgeInsets.symmetric(vertical: 0),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
@@ -212,97 +211,120 @@ class _HomeState extends State<Home> {
                 left: 0,
                 right: 0,
                 bottom: 70,
-                child: _rooms.isEmpty
-                    ? Center(child: CircularProgressIndicator())
-                    : ListView.builder(
-                  itemCount: _rooms.length,
-                  itemBuilder: (context, index) {
-                    final room = _rooms[index];
-                    final parts = room.roomid.split('_');
-                    if (parts.length != 2) return SizedBox();
+                child: Builder(
+                  builder: (context) {
+                    // 👉 검색어 기준으로 선생님 이름 필터링
+                    final filteredRooms = _rooms.where((room) {
+                      final parts = room.roomid.split('_');
+                      if (parts.length != 2) return false;
 
-                    final otherUserId = parts[0] == _teacherId ? parts[1] : parts[0];
-                    final teacherName = _teacherNames[otherUserId] ?? '선생님 이름';
+                      final otherUserId = parts[0] == _teacherId ? parts[1] : parts[0];
+                      final name = _teacherNames[otherUserId]?.toLowerCase() ?? '';
+                      return name.contains(_search.toLowerCase());
+                    }).toList();
 
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => Chat()),
-                          );
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(6),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black12,
-                                blurRadius: 4,
-                                offset: Offset(0, 2),
-                              )
-                            ],
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: 48,
-                                height: 48,
-                                margin: EdgeInsets.only(right: 12),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[300],
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Image.asset('assets/images/def_photo.png'),
-                              ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      teacherName+' 학생',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18),
-                                    ),
-                                    SizedBox(height: 4),
-                                    Text(
-                                      room.lastmessageid ?? '',
-                                      style: TextStyle(color: Colors.grey[900]),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  unreadCount! > 0
-                                      ? Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFF3C72BD),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(
-                                      unreadCount.toString(),
-                                      style: TextStyle(color: Colors.white, fontSize: 12),
-                                    ),
+                    return filteredRooms.isEmpty
+                        ? (_search.isEmpty
+                        ? Center(child: CircularProgressIndicator())
+                        : Center(
+                      child: Text(
+                        '검색 결과가 없습니다.',
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                    ))
+                        : ListView.builder(
+                      itemCount: filteredRooms.length,
+                      itemBuilder: (context, index) {
+                        final room = filteredRooms[index];
+                        final parts = room.roomid.split('_');
+                        if (parts.length != 2) return SizedBox();
+
+                        final otherUserId = parts[0] == _teacherId ? parts[1] : parts[0];
+                        final teacherName = _teacherNames[otherUserId] ?? '선생님 이름';
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => Chat()),
+                              );
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(6),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 4,
+                                    offset: Offset(0, 2),
                                   )
-                                      : SizedBox.shrink(),
                                 ],
                               ),
-                            ],
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: 48,
+                                    height: 48,
+                                    margin: EdgeInsets.only(right: 12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[300],
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Image.asset('assets/images/def_photo.png'),
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${teacherName} 학생',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          room.lastmessageid ?? '',
+                                          style: TextStyle(color: Colors.grey[900]),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      (unreadCount != null && unreadCount! > 0)
+                                          ? Container(
+                                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Color(0xFF3C72BD),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Text(
+                                          unreadCount.toString(),
+                                          style: TextStyle(color: Colors.white, fontSize: 12),
+                                        ),
+                                      )
+                                          : SizedBox.shrink(),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     );
                   },
                 ),
               ),
+
               // 하단 내비게이션
               Positioned(
                 bottom: 0,
