@@ -1,6 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:qna_frontend/screens/MySchool.dart';
+import '../classes/UserProvider.dart';
 import '../models/dto.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -21,24 +22,33 @@ class _HomeState extends State<Home> {
   String _search = '';
   bool _isSearching = false;
   final FocusNode _focusNode = FocusNode();
-  late String _teacherId;
+  String? _teacherId;
+  int? unreadCount;
+  Map<String, String> _teacherNames = {}; // 선생님 ID → 이름 캐시
 
   @override
   void initState() {
     super.initState();
     _focusNode.addListener(() {
       if (!_focusNode.hasFocus) {
-        setState(() {
-          _isSearching = false;
-        });
+        setState(() => _isSearching = false);
       }
     });
     _loadTeacherId();
   }
 
+  String getTheyId(String roomId, String myId) {
+    final parts = roomId.split('_');
+    if (parts.length != 2 || myId == null) return '';
+    return parts[0] == myId ? parts[1] : parts[0];
+  }
+
   Future<void> _loadTeacherId() async {
     final user = FirebaseAuth.instance.currentUser;
-    _teacherId = user?.uid ?? '';
+    setState(() {
+      _teacherId = user?.uid;
+    });
+    print(_teacherId);
     await _loadRooms();
   }
 
@@ -48,19 +58,41 @@ class _HomeState extends State<Home> {
     try {
       final url = Uri.parse(
           'https://qna-messenger.mirim-it-show.site/api/chat/search?search=$_search');
-      final response = await http.get(url,
+      final response = await http.get(
+        url,
         headers: {'Authorization': 'Bearer $idToken'},
       );
 
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> decoded = json.decode(response.body);
-        final res = Response<List<dynamic>>.fromJson(decoded, (data) => data);
+        final List<dynamic> data = decoded['data'];
+        final List<RoomDto> rooms = data.map((item) => RoomDto.fromJson(item)).toList();
+        print('받아온 데이터: ${decoded['data']}');
 
-        final List<RoomDto> rooms = (res.data as List<dynamic>)
-            .map((e) => RoomDto.fromJson(e as Map<String, dynamic>))
-            .toList();
+        final myId = Provider.of<UserProvider>(context, listen: false).user?.userid;
+        print(myId);
+        final RoomId = decoded['data'][0]['room']?['roomid'];
+        final theyId = getTheyId(RoomId, myId!);
+        final _unreadCount = decoded['unread'] ?? 0;
+
+        setState(() {
+          _teacherId = theyId;
+          unreadCount = _unreadCount;
+        });
 
         setState(() => _rooms = rooms);
+
+        // 각 방의 선생님 이름 비동기 로드
+        for (final room in rooms) {
+          final parts = room.roomid.split('_');
+          if (parts.length != 2) continue;
+          final otherUserId = parts[0] == _teacherId ? parts[1] : parts[0];
+
+          if (!_teacherNames.containsKey(otherUserId)) {
+            _fetchTeacherName(otherUserId);
+          }
+        }
       } else {
         print('API 응답 오류: ${response.statusCode}');
       }
@@ -69,27 +101,27 @@ class _HomeState extends State<Home> {
     }
   }
 
-  Future<String> _fetchStudentName(String studentId) async {
-    // 예시 API URL: 학생 정보 조회 API 주소를 적절히 수정하세요.
-    final currentUser = FirebaseAuth.instance.currentUser;
-    final idToken = await currentUser?.getIdToken();
-
+  Future<void> _fetchTeacherName(String teacherId) async {
     try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      final idToken = await currentUser?.getIdToken();
+
       final url = Uri.parse(
-          'https://qna-messenger.mirim-it-show.site/api/student/$studentId');
-      final response = await http.get(url,
-          headers: {'Authorization': 'Bearer $idToken'});
+          'https://qna-messenger.mirim-it-show.site/api/teacher/profile/$_teacherId');
+      final response = await http.get(url, headers: {'Authorization': 'Bearer $idToken'});
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-        return data['name'] ?? '알 수 없음';
+        final name = data['data']?['user']?['name'];
+        print(data);
+        setState(() {
+          _teacherNames[teacherId] = name;
+        });
       } else {
-        print('학생 정보 API 오류: ${response.statusCode}');
-        return '알 수 없음';
+        print('이름 정보 로드 실패: ${response.statusCode}');
       }
     } catch (e) {
-      print('학생 정보 조회 중 예외 발생: $e');
-      return '알 수 없음';
+      print('선생님 정보 요청 실패: $e');
     }
   }
 
@@ -103,15 +135,12 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: GestureDetector(
           behavior: HitTestBehavior.translucent,
           onTap: () {
             FocusScope.of(context).unfocus();
-            setState(() {
-              _isSearching = false;
-            });
+            setState(() => _isSearching = false);
           },
           child: Stack(
             children: [
@@ -119,8 +148,7 @@ class _HomeState extends State<Home> {
                 top: 0,
                 left: 0,
                 right: 0,
-                child:
-                Image.asset('assets/images/topNav.png', fit: BoxFit.cover),
+                child: Image.asset('assets/images/topNav.png', fit: BoxFit.cover),
               ),
               Positioned(
                 top: 40,
@@ -134,10 +162,8 @@ class _HomeState extends State<Home> {
                       ? TextField(
                     focusNode: _focusNode,
                     onChanged: (value) {
-                      setState(() {
-                        _search = value;
-                      });
-                      _loadRooms(); // 검색어 변경 시 바로 조회
+                      setState(() => _search = value);
+                      _loadRooms();
                     },
                     style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
@@ -176,25 +202,97 @@ class _HomeState extends State<Home> {
                 right: 0,
                 bottom: 70,
                 child: _rooms.isEmpty
-                    ? Center(child: Text('채팅방이 없습니다.'))
-                    : FutureBuilder<List<Widget>>(
-                  future: _buildChatList(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState != ConnectionState.done) {
-                      return Center(child: CircularProgressIndicator());
-                    }
+                    ? Center(child: CircularProgressIndicator())
+                    : ListView.builder(
+                  itemCount: _rooms.length,
+                  itemBuilder: (context, index) {
+                    final room = _rooms[index];
+                    final parts = room.roomid.split('_');
+                    if (parts.length != 2) return SizedBox();
 
-                    if (snapshot.hasError) {
-                      return Center(child: Text('채팅방을 불러오는 중 오류가 발생했습니다.'));
-                    }
+                    final otherUserId = parts[0] == _teacherId ? parts[1] : parts[0];
+                    final teacherName = _teacherNames[otherUserId] ?? '선생님 이름';
 
-                    final chatWidgets = snapshot.data ?? [];
-                    return SingleChildScrollView(
-                      child: Column(children: chatWidgets),
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Chat()),
+                          );
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(6),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 4,
+                                offset: Offset(0, 2),
+                              )
+                            ],
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 48,
+                                height: 48,
+                                margin: EdgeInsets.only(right: 12),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Image.asset('assets/images/def_photo.png'),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      teacherName,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      room.lastmessageid ?? '',
+                                      style: TextStyle(color: Colors.grey[900]),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  unreadCount! > 0
+                                      ? Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFF3C72BD),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      unreadCount.toString(),
+                                      style: TextStyle(color: Colors.white, fontSize: 12),
+                                    ),
+                                  )
+                                      : SizedBox.shrink(),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     );
                   },
                 ),
               ),
+              // 하단 내비게이션
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -208,10 +306,7 @@ class _HomeState extends State<Home> {
                       IconButton(
                         icon: Image.asset('assets/btns/mypgDis.png', width: 40),
                         onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => MySchool()));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => MySchool()));
                         },
                       ),
                       IconButton(
@@ -221,19 +316,13 @@ class _HomeState extends State<Home> {
                       IconButton(
                         icon: Image.asset('assets/btns/calDis.png', width: 40),
                         onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Calendar()));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => Calendar()));
                         },
                       ),
                       IconButton(
                         icon: Image.asset('assets/btns/optDis.png', width: 40),
                         onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Option()));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => Option()));
                         },
                       ),
                     ],
@@ -245,92 +334,5 @@ class _HomeState extends State<Home> {
         ),
       ),
     );
-  }
-
-  Future<List<Widget>> _buildChatList() async {
-    List<Widget> widgets = [];
-
-    for (final room in _rooms) {
-      final parts = room.roomid.split('_');
-      if (parts.length != 2) continue;
-
-      final studentId = parts[0];
-      // 학생 이름 API에서 가져오기
-      final studentName = await _fetchStudentName(studentId);
-      final lastMessage = room.lastmessageid ?? '';
-
-      widgets.add(Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        child: GestureDetector(
-          onTap: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => Chat()));
-          },
-          child: Container(
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(6),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 4,
-                  offset: Offset(0, 2),
-                )
-              ],
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  margin: EdgeInsets.only(right: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    shape: BoxShape.circle,
-                  ),
-                  child: Image.asset('assets/images/def_photo.png'),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(studentName,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 18)),
-                      SizedBox(height: 4),
-                      Text(lastMessage, style: TextStyle(color: Colors.grey[900])),
-                    ],
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Container(
-                      padding:
-                      EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Color(0xFF3C72BD),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text('1',
-                          style:
-                          TextStyle(color: Colors.white, fontSize: 12)),
-                    ),
-                    SizedBox(height: 10),
-                    Text('1시간 전',
-                        style: TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ));
-    }
-
-    return widgets;
   }
 }

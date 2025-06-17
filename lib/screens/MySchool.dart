@@ -9,7 +9,6 @@ import 'package:share_plus/share_plus.dart';
 import 'calendar.dart';
 import 'home.dart';
 import 'option.dart';
-import 'profile.dart';
 import '../classes/UserProvider.dart';
 
 class MySchool extends StatefulWidget {
@@ -74,6 +73,7 @@ class _MySchool extends State<MySchool> {
         final userType = user['usertype'];
         final name = user['name']?.toString().toLowerCase() ?? '';
         final search = _searchText.toLowerCase();
+        // 교사는 학생을, 학생은 교사를 찾는다
         final targetType = isTeacher ? 'STUDENT' : 'TEACHER';
         return userType == targetType && name.contains(search);
       }).toList();
@@ -137,59 +137,59 @@ class _MySchool extends State<MySchool> {
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: _filteredUsers.isEmpty
                   ? Align(
-                alignment: Alignment(0, -0.3),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      isTeacher
-                          ? '아직 Q&A에 가입한 학생이 없어요!\n아래 버튼으로 초대해보세요!'
-                          : '아직 Q&A에 가입하신 선생님이 없어요!\n아래 버튼으로 초대해보세요!',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                  alignment: Alignment(0, -0.3),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        isTeacher
+                            ? '아직 Q&A에 가입한 학생이 없어요!\n아래 버튼으로 초대해보세요!'
+                            : '아직 Q&A에 가입하신 선생님이 없어요!\n아래 버튼으로 초대해보세요!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 20),
-                    if (!isTeacher)
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          try {
-                            await Share.share(
-                              'Q&A에 가입해보세요!\n https://github.com/ItShowMessenger',
-                              subject: 'Q&A 선생님 초대',
-                            );
-                          } catch (e) {
-                            print("공유 실패: $e");
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('공유에 실패했습니다.')),
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF3C72BD),
-                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
+                      SizedBox(height: 20),
+                      if (!isTeacher)
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            try {
+                              await Share.share(
+                                'Q&A에 가입해보세요!\n https://github.com/ItShowMessenger',
+                                subject: 'Q&A 선생님 초대',
+                              );
+                            } catch (e) {
+                              print("공유 실패: $e");
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('공유에 실패했습니다.')),
+                              );
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFF3C72BD),
+                            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6),
+                            ),
                           ),
-                        ),
-                        icon: Image.asset(
-                          'assets/icons/icon_share.png',
-                          width: 20,
-                          height: 20,
-                          color: Colors.white,
-                        ),
-                        label: Text(
-                          '링크 공유하기',
-                          style: TextStyle(
-                            fontSize: 16,
+                          icon: Image.asset(
+                            'assets/icons/icon_share.png',
+                            width: 20,
+                            height: 20,
                             color: Colors.white,
                           ),
+                          label: Text(
+                            '링크 공유하기',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
-                      ),
-                  ],
-                ),
+                    ],
+                  )
               )
                   : ListView.builder(
                 itemCount: _filteredUsers.length,
@@ -198,77 +198,62 @@ class _MySchool extends State<MySchool> {
                   final user = person['user'];
                   final roleInfo = isTeacher ? null : person['teacher'];
 
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => Profile(
-                            userType: user['usertype'],
-                            data: {
-                              'userDto': user,
-                              'teacherDto': roleInfo,
-                            },
+                  return Container(
+                    margin: EdgeInsets.only(bottom: 12),
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          margin: EdgeInsets.only(right: 12),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.grey[300],
+                          ),
+                          child: user['imgurl'] != null
+                              ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              user['imgurl'],
+                              fit: BoxFit.cover,
+                              width: 48,
+                              height: 48,
+                            ),
+                          )
+                              : Image.asset('assets/images/def_photo.png'),
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isTeacher ? user['name']+ ' 학생' : user['name']+' 선생님'?? '이름 없음',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 18),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                isTeacher
+                                    ? user['email'] ?? ''
+                                    : (roleInfo?['subject'] ?? '과목 없음'),
+                                style: TextStyle(color: Colors.grey[900]),
+                              ),
+                            ],
                           ),
                         ),
-                      );
-                    },
-                    child: Container(
-                      margin: EdgeInsets.only(bottom: 12),
-                      padding: EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(6),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 4,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 48,
-                            height: 48,
-                            margin: EdgeInsets.only(right: 12),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: Colors.grey[300],
-                            ),
-                            child: user['imgurl'] != null
-                                ? ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.network(
-                                user['imgurl'],
-                                fit: BoxFit.cover,
-                                width: 48,
-                                height: 48,
-                              ),
-                            )
-                                : Image.asset('assets/images/def_photo.png'),
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  isTeacher ? '${user['name']} 학생' : '${user['name']} 선생님',
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  isTeacher
-                                      ? user['email'] ?? ''
-                                      : (roleInfo?['subject'] ?? '과목 없음'),
-                                  style: TextStyle(color: Colors.grey[900]),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                      ],
                     ),
                   );
                 },

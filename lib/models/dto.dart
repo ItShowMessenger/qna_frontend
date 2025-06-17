@@ -116,9 +116,10 @@ class RoomDto {
   });
 
   factory RoomDto.fromJson(Map<String, dynamic> json) {
+    final room = json['room'];
     return RoomDto(
-      roomid: json['roomid'],
-      lastmessageid: json['lastmessageid'],
+      roomid: room['roomid'] ?? '',
+      lastmessageid: room['lastmessageid'],
       status: json['status'] == null
           ? null
           : RoomStatus.values.firstWhere((e) => describeEnum(e).toUpperCase() == json['status']),
