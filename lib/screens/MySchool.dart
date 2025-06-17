@@ -121,7 +121,7 @@ class _MySchool extends State<MySchool> {
                 _filterUsers();
               },
               decoration: InputDecoration(
-                hintText: isTeacher ? '학생 이름으로 찾기' : '성함으로 찾기',
+                hintText: isTeacher ? '학생 찾기' : '선생님 찾기',
                 prefixIcon: Icon(Icons.search),
                 contentPadding: EdgeInsets.symmetric(vertical: 0),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),

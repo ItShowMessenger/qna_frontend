@@ -18,6 +18,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  UserDto? _user;
   List<RoomDto> _rooms = [];
   String _search = '';
   bool _isSearching = false;
@@ -35,6 +36,7 @@ class _HomeState extends State<Home> {
       }
     });
     _loadTeacherId();
+
   }
 
   String getTheyId(String roomId, String myId) {
@@ -44,11 +46,12 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> _loadTeacherId() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     final user = FirebaseAuth.instance.currentUser;
+    _user = userProvider.user;
     setState(() {
       _teacherId = user?.uid;
     });
-    print(_teacherId);
     await _loadRooms();
   }
 
@@ -155,7 +158,7 @@ class _HomeState extends State<Home> {
                 left: 0,
                 right: 0,
                 child: Container(
-                  height: 50,
+                  height: 60,
                   color: Color(0xFF3C72BD),
                   padding: EdgeInsets.symmetric(horizontal: 25),
                   child: _isSearching
@@ -172,32 +175,40 @@ class _HomeState extends State<Home> {
                       border: InputBorder.none,
                     ),
                   )
-                      : Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('채팅',
-                          style:
-                          TextStyle(color: Colors.white, fontSize: 23)),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _isSearching = true;
-                            FocusScope.of(context).requestFocus(_focusNode);
-                          });
-                        },
-                        child: Image.asset(
-                          'assets/icons/icon_search.png',
-                          color: Colors.white,
-                          width: 30,
-                          height: 30,
-                        ),
+                      : Center(
+                    child: Text(
+                      '채팅',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 23,
                       ),
-                    ],
+                    ),
+                  ),
+                ),
+              ),
+
+              Positioned(
+                top: 120,
+                left: 16,
+                right: 16,
+                child: TextField(
+                  onChanged: (text) {
+                    setState(() {
+                      _search = text;
+                    });
+                    _loadRooms(); // 검색 시 채팅방 필터링
+                  },
+                  decoration: InputDecoration(
+                    hintText: _user?.usertype == UserType.teacher  ? '학생 찾기' : '선생님 찾기',
+                    prefixIcon: Icon(Icons.search),
+                    contentPadding: EdgeInsets.symmetric(vertical: 0),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
                   ),
                 ),
               ),
               Positioned(
-                top: 140,
+                top: 190,
                 left: 0,
                 right: 0,
                 bottom: 70,
@@ -253,7 +264,7 @@ class _HomeState extends State<Home> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      teacherName,
+                                      teacherName+' 학생',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 18),

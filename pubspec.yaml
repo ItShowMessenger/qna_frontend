@@ -70,6 +70,8 @@ flutter:
     - assets/images/google_logo.png
     - assets/images/topNav.png
     - assets/images/def_photo.png
+    - assets/images/they.png
+    - assets/images/my.png
     - assets/btns/mypgDis.png
     - assets/btns/mypgAct.png
     - assets/btns/chatDis.png
