@@ -248,7 +248,11 @@ class _HomeState extends State<Home> {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => Chat()),
+                                MaterialPageRoute(builder: (context) => Chat(
+                                  roomId: room.roomid,
+                                  they: teacherName,
+                                ),
+                                ),
                               );
                             },
                             child: Container(
