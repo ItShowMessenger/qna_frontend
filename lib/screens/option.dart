@@ -20,6 +20,9 @@ class Option extends StatefulWidget {
 }
 
 class _OptionState extends State<Option> {
+  String _newSubject = '';
+  String _newOffice = '';
+
   UserDto? _user;
   TeacherDto? _teacher;
   List<FaqDto> _faqs = [];
@@ -35,6 +38,99 @@ class _OptionState extends State<Option> {
     super.initState();
     _loadUserFromProvider();
     _fetchUserProfile();
+  }
+
+  void _showEditTeacherInfoPopup() {
+    _newSubject = _teacher?.subject ?? '';
+    _newOffice = _teacher?.office ?? '';
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            bool isModified = _newSubject != _teacher?.subject || _newOffice != _teacher?.office;
+
+            return AlertDialog(
+              title: Text('교사 정보 수정'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    decoration: InputDecoration(labelText: '담당 과목'),
+                    controller: TextEditingController(text: _newSubject)
+                      ..selection = TextSelection.fromPosition(TextPosition(offset: _newSubject.length)),
+                    onChanged: (value) {
+                      setState(() => _newSubject = value);
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    decoration: InputDecoration(labelText: '교무실'),
+                    controller: TextEditingController(text: _newOffice)
+                      ..selection = TextSelection.fromPosition(TextPosition(offset: _newOffice.length)),
+                    onChanged: (value) {
+                      setState(() => _newOffice = value);
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                if (!isModified)
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text('취소하기'),
+                  ),
+                if (isModified)
+                  TextButton(
+                    onPressed: () async {
+                      await _updateTeacherInfo();
+                      Navigator.pop(context);
+                    },
+                    child: Text('수정하기', style: TextStyle(color: Colors.blue)),
+                  ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _updateTeacherInfo() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      final idToken = await currentUser?.getIdToken();
+
+      if (idToken == null || _teacher == null) return;
+
+      // TeacherDto 업데이트
+      final updatedTeacher = _teacher!.copyWith(
+        subject: _newSubject,
+        office: _newOffice,
+      );
+
+      final response = await http.patch(
+        Uri.parse('https://qna-messenger.mirim-it-show.site/api/user/teacher'),  // 🔁 실제 API 경로로 교체
+        headers: {
+          'Authorization': 'Bearer $idToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(updatedTeacher.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _teacher = updatedTeacher;
+        });
+        _showAlert('정보가 성공적으로 수정되었습니다.');
+        Navigator.pop(context);
+      } else {
+        _showAlert('수정 실패: ${response.statusCode}');
+      }
+    } catch (e) {
+      _showAlert('오류 발생: $e');
+    }
   }
 
   void _loadUserFromProvider() {
@@ -291,19 +387,22 @@ class _OptionState extends State<Option> {
                   SizedBox(height: 30),
 
                   if (isTeacher && _teacher != null) ...[
-                    Card(
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('담당과목 : ${_teacher!.subject}', style: TextStyle(fontSize: 18)),
-                            SizedBox(height: 15),
-                            Text('교무실 : ${_teacher!.office}', style: TextStyle(fontSize: 18)),
-                          ],
+                    GestureDetector(
+                      onTap: _showEditTeacherInfoPopup,
+                      child: Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('담당과목 : ${_teacher!.subject}', style: TextStyle(fontSize: 18)),
+                              SizedBox(height: 15),
+                              Text('교무실 : ${_teacher!.office}', style: TextStyle(fontSize: 18)),
+                            ],
+                          ),
                         ),
                       ),
                     ),

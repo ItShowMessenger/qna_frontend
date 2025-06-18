@@ -9,6 +9,8 @@ class UserProvider extends ChangeNotifier {
   TeacherDto? _teacher;
   TeacherDto? get teacher => _teacher;
 
+  bool get isTeacher => _user?.usertype == 'teacher';
+
   void setUser(UserDto user) {
     _user = user;
     notifyListeners();

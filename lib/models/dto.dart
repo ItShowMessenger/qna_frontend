@@ -75,7 +75,27 @@ class TeacherDto {
       office: json['office'],
     );
   }
-}
+
+  TeacherDto copyWith({
+    String? teacherid,
+    String? subject,
+    String? office,
+  }) {
+    return TeacherDto(
+      teacherid: teacherid ?? this.teacherid,
+      subject: subject ?? this.subject,
+      office: office ?? this.office,
+    );
+  }
+    Map<String, dynamic> toJson() {
+      return {
+        'teacherid': teacherid,
+        'subject': subject,
+        'office': office,
+      };
+    }
+  }
+
 
 // ───── FaqDto ─────────────────────────────────────────────
 
