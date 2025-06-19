@@ -1,28 +1,36 @@
-// user_provider.dart
 import 'package:flutter/material.dart';
-import '../models/dto.dart';
+import '../models/dto.dart'; // UserDto, TeacherDto, FaqDto, AlarmSettingDto가 정의된 파일
 
 class UserProvider extends ChangeNotifier {
   UserDto? _user;
-  UserDto? get user => _user;
-
   TeacherDto? _teacher;
+  List<FaqDto> _faqs = [];
+  AlarmSettingDto? _alarmSetting;
+
+  // getter
+  UserDto? get user => _user;
   TeacherDto? get teacher => _teacher;
+  List<FaqDto> get faqs => _faqs;
+  AlarmSettingDto? get alarmSetting => _alarmSetting;
 
-  bool get isTeacher => _user?.usertype == 'teacher';
-
-  void setUser(UserDto user) {
-    _user = user;
+  // setter
+  void setUser(UserDto? u) {
+    _user = u;
     notifyListeners();
   }
 
-  void setTeacher(TeacherDto teacher) {
-    _teacher = teacher;
+  void setTeacher(TeacherDto? t) {
+    _teacher = t;
     notifyListeners();
   }
 
-  void clearUser() {
-    _user = null;
+  void setFaqs(List<FaqDto> f) {
+    _faqs = f;
+    notifyListeners();
+  }
+
+  void setAlarmSetting(AlarmSettingDto a) {
+    _alarmSetting = a;
     notifyListeners();
   }
 }

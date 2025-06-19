@@ -224,11 +224,11 @@ class _HomeState extends State<Home> {
                     }).toList();
 
                     return filteredRooms.isEmpty
-                        ? (_search.isEmpty
+                        ? (_rooms.isEmpty
                         ? Center(child: CircularProgressIndicator())
                         : Center(
                       child: Text(
-                        '검색 결과가 없습니다.',
+                        '채팅방이 없습니다.',
                         style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                     ))

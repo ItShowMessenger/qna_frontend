@@ -31,6 +31,10 @@ class _OptionState extends State<Option> {
   bool _calendarNotification = true;
   bool _chatNotification = true;
 
+  final switchActiveColor = Color(0xFF566B92);
+  final switchInactiveThumbColor = Colors.grey.shade400;
+  final switchInactiveTrackColor = Colors.grey.shade300;
+
   final TextEditingController _deleteConfirmController = TextEditingController();
 
   @override
@@ -38,6 +42,95 @@ class _OptionState extends State<Option> {
     super.initState();
     _loadUserFromProvider();
     _fetchUserProfile();
+  }
+
+  void _loadUserFromProvider() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    setState(() {
+      _user = userProvider.user;
+      _teacher = userProvider.teacher;
+      _faqs = userProvider.faqs;
+
+      // ✅ 알림 설정도 불러오기
+      final alarm = userProvider.alarmSetting;
+      if (alarm != null) {
+        _notificationsEnabled = alarm.alarm;
+        _calendarNotification = alarm.schedule;
+        _chatNotification = alarm.chat;
+      }
+    });
+  }
+
+  Future<void> _fetchUserProfile() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      final idToken = await currentUser?.getIdToken();
+
+      if (idToken == null) return;
+
+      final response = await http.get(
+        Uri.parse('https://qna-messenger.mirim-it-show.site/api/user/profile'),
+        headers: {'Authorization': 'Bearer $idToken'},
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final data = responseData['data'];
+
+        final userDto = UserDto.fromJson(data['user']);
+        final teacherDto = data['teacher'] != null ? TeacherDto.fromJson(data['teacher']) : null;
+        final faqList = (data['faqList'] as List?)?.map((e) => FaqDto.fromJson(e)).toList() ?? [];
+        final alarmSettingDto = AlarmSettingDto.fromJson(data['alarm']);
+
+        setState(() {
+          _user = userDto;
+          _teacher = teacherDto;
+          _faqs = faqList;
+          _notificationsEnabled = alarmSettingDto.alarm;
+          _calendarNotification = alarmSettingDto.schedule;
+          _chatNotification = alarmSettingDto.chat;
+        });
+
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.setUser(userDto);
+      } else {
+        print('프로필 조회 실패: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('프로필 조회 오류: $e');
+    }
+  }
+
+  Future<void> _updateAlarmSettings() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      final idToken = await currentUser?.getIdToken();
+
+      if (idToken == null || _user == null) return;
+
+      final alarmSettings = AlarmSettingDto(
+        userid: _user!.userid,
+        alarm: _notificationsEnabled,
+        chat: _chatNotification,
+        schedule: _calendarNotification,
+      );
+
+      final response = await http.patch(
+        Uri.parse('https://qna-messenger.mirim-it-show.site/api/user/alarm'),
+        headers: {
+          'Authorization': 'Bearer $idToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(alarmSettings.toJson()),
+      );
+
+      if (response.statusCode != 200) {
+        print('알림 설정 저장 실패: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('알림 저장 오류: $e');
+    }
   }
 
   void _showEditTeacherInfoPopup() {
@@ -104,14 +197,13 @@ class _OptionState extends State<Option> {
 
       if (idToken == null || _teacher == null) return;
 
-      // TeacherDto 업데이트
       final updatedTeacher = _teacher!.copyWith(
         subject: _newSubject,
         office: _newOffice,
       );
 
       final response = await http.patch(
-        Uri.parse('https://qna-messenger.mirim-it-show.site/api/user/teacher'),  // 🔁 실제 API 경로로 교체
+        Uri.parse('https://qna-messenger.mirim-it-show.site/api/user/teacher'),
         headers: {
           'Authorization': 'Bearer $idToken',
           'Content-Type': 'application/json',
@@ -133,73 +225,47 @@ class _OptionState extends State<Option> {
     }
   }
 
-  void _loadUserFromProvider() {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    setState(() {
-      _user = userProvider.user;
+  Future<void> _updateAlarmSetting() async {
+    final idToken = await FirebaseAuth.instance.currentUser?.getIdToken();
+    if (_user == null || idToken == null) return;
 
-      // user가 teacher 타입일 때, 별도로 TeacherDto를 받아서 할당해야 함
-      if (_user?.usertype == UserType.teacher) {
-        // 예: userProvider가 teacher 데이터를 따로 가지고 있다고 가정
-        _teacher = userProvider.teacher;  // 혹은 teacher 데이터를 가져오는 함수/변수를 사용
-      } else {
-        _teacher = null;
-      }
-      _faqs = [];
-    });
-  }
+    final updated = AlarmSettingDto(
+      userid: _user!.userid, // 또는 _user!.userid, DTO에 따라
+      alarm: _notificationsEnabled,
+      chat: _chatNotification,
+      schedule: _calendarNotification,
+    );
 
+    final response = await http.patch(
+      Uri.parse('https://qna-messenger.mirim-it-show.site/api/user/alarm'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(updated.toJson()),
+    );
 
-
-  Future<void> _fetchUserProfile() async {
-    try {
-      final currentUser = FirebaseAuth.instance.currentUser;
-      final idToken = await currentUser?.getIdToken();
-
-      if (idToken == null) {
-        print('토큰 없음');
-        return;
-      }
-
-      final response = await http.get(
-        Uri.parse('https://qna-messenger.mirim-it-show.site/api/user/profile'),
-        headers: {'Authorization': 'Bearer $idToken'},
-      );
-
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        print(responseData);
-        final data = responseData['data'];
-
-        final userDto = UserDto.fromJson(data['user']);
-        final teacherDto = data['teacher'] != null ? TeacherDto.fromJson(data['teacher']) : null;
-        final faqList = (data['faqList'] as List?)?.map((e) => FaqDto.fromJson(e)).toList() ?? [];
-        final alarmSettingDto = AlarmSettingDto.fromJson(data['alarm']);
-
-        setState(() {
-          _user = userDto;
-          _teacher = teacherDto;
-          _faqs = faqList;
-
-          _notificationsEnabled = alarmSettingDto.alarm;
-          _calendarNotification = alarmSettingDto.schedule;
-          _chatNotification = alarmSettingDto.chat;
-        });
-
-        final userProvider = Provider.of<UserProvider>(context, listen: false);
-        userProvider.setUser(userDto);
-      } else {
-        print('프로필 조회 실패: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('프로필 조회 중 오류 발생: $e');
+    if (response.statusCode == 200) {
+      Provider.of<UserProvider>(context, listen: false).setAlarmSetting(updated);
+    } else {
+      print('알림 설정 저장 실패: ${response.statusCode}');
     }
   }
 
-  @override
-  void dispose() {
-    _deleteConfirmController.dispose();
-    super.dispose();
+
+  void _showAlert(String message) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        content: Text(message),
+        actions: [
+          TextButton(
+            child: Text('확인'),
+            onPressed: () => Navigator.pop(context),
+          )
+        ],
+      ),
+    );
   }
 
   void _showDeleteConfirmPopup() {
@@ -213,14 +279,11 @@ class _OptionState extends State<Option> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('- 참여하고 있던 채팅방에서 나가지며 대화 내역도 같이 삭제됩니다.'),
+            Text('- 채팅방에서 나가지며 대화 내역도 삭제됩니다.'),
             SizedBox(height: 8),
             Text('- 개인 프로필 설정이 모두 사라집니다.'),
             SizedBox(height: 16),
-            Text(
-              '진행하시겠다면 이름 : ${_user!.name} 을 입력해주세요.',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+            Text('진행하시려면 이름: ${_user!.name} 을 입력해주세요.', style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
             TextField(
               controller: _deleteConfirmController,
@@ -229,10 +292,7 @@ class _OptionState extends State<Option> {
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('취소'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('취소')),
           TextButton(
             onPressed: () {
               if (_deleteConfirmController.text.trim() == _user!.name) {
@@ -275,10 +335,7 @@ class _OptionState extends State<Option> {
         title: Text('로그아웃시 초기화면으로 돌아갑니다.'),
         content: Text('로그아웃 하시겠습니까?'),
         actions: [
-          TextButton(
-            child: Text('취소'),
-            onPressed: () => Navigator.pop(context),
-          ),
+          TextButton(child: Text('취소'), onPressed: () => Navigator.pop(context)),
           TextButton(
             child: Text('로그아웃'),
             onPressed: () async {
@@ -286,18 +343,15 @@ class _OptionState extends State<Option> {
               Navigator.pop(context);
 
               try {
-                await googleSignIn.disconnect();  // ✅ await 가능
+                await googleSignIn.disconnect();
                 await googleSignIn.signOut();
               } catch (e) {
-                print('Google 로그아웃 중 오류: $e');
+                print('Google 로그아웃 오류: $e');
               }
 
-              await FirebaseAuth.instance.signOut(); // ✅ Firebase 로그아웃 추가 (필수)
+              await FirebaseAuth.instance.signOut();
 
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => Splash()),
-              );
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => Splash()));
             },
           )
         ],
@@ -305,19 +359,10 @@ class _OptionState extends State<Option> {
     );
   }
 
-  void _showAlert(String message) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        content: Text(message),
-        actions: [
-          TextButton(
-            child: Text('확인'),
-            onPressed: () => Navigator.pop(context),
-          )
-        ],
-      ),
-    );
+  @override
+  void dispose() {
+    _deleteConfirmController.dispose();
+    super.dispose();
   }
 
   @override
@@ -329,15 +374,10 @@ class _OptionState extends State<Option> {
     final isTeacher = _user!.usertype == UserType.teacher;
 
     return Scaffold(
-      backgroundColor: Colors.white,  // 배경색 명시적으로 화이트 지정
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Image.asset('assets/images/topNav.png', fit: BoxFit.cover),
-          ),
+          Positioned(top: 0, left: 0, right: 0, child: Image.asset('assets/images/topNav.png', fit: BoxFit.cover)),
           Positioned(
             top: 40,
             left: 0,
@@ -356,7 +396,7 @@ class _OptionState extends State<Option> {
             top: 140,
             left: 0,
             right: 0,
-            bottom: 70,  // 네비게이션 바와 겹치지 않도록 공간 확보
+            bottom: 70,
             child: SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: 25),
               child: Column(
@@ -376,7 +416,7 @@ class _OptionState extends State<Option> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text( '${_user!.name} ${isTeacher ? '선생님' : '학생'}',
+                          Text('${_user!.name} ${isTeacher ? '선생님' : '학생'}',
                               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                           SizedBox(height: 4),
                           Text(_user!.email, style: TextStyle(color: Colors.grey, fontSize: 16)),
@@ -423,7 +463,7 @@ class _OptionState extends State<Option> {
                     SizedBox(height: 20),
                   ],
 
-                  // 알림 설정 카드
+                  /// 알림 설정 UI
                   Card(
                     elevation: 2,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -435,37 +475,64 @@ class _OptionState extends State<Option> {
                             title: Text('전체 알림 설정', style: TextStyle(fontSize: 18)),
                             trailing: Switch(
                               value: _notificationsEnabled,
-                              activeColor: Color(0xFF566B92), // 전체 알림 버튼 색 유지
+                              activeColor: switchActiveColor,
+                              inactiveThumbColor: switchInactiveThumbColor,
+                              inactiveTrackColor: switchInactiveTrackColor,
                               onChanged: (bool value) {
                                 setState(() {
                                   _notificationsEnabled = value;
-                                  if (!value) {
+                                  if (value) {
+                                    _calendarNotification = true;
+                                    _chatNotification = true;
+                                  } else {
                                     _calendarNotification = false;
                                     _chatNotification = false;
                                   }
                                 });
+                                _updateAlarmSetting();
                               },
                             ),
                           ),
-                          Divider(),
+
+// 일정 알림 스위치
                           ListTile(
                             title: Text('일정 알림', style: TextStyle(fontSize: 15)),
                             trailing: Switch(
                               value: _calendarNotification,
+                              activeColor: switchActiveColor,
+                              inactiveThumbColor: switchInactiveThumbColor,
+                              inactiveTrackColor: switchInactiveTrackColor,
                               onChanged: _notificationsEnabled
-                                  ? (bool value) => setState(() => _calendarNotification = value)
+                                  ? (bool value) {
+                                setState(() {
+                                  _calendarNotification = value;
+                                  // 전체 알림이나 다른 알림 상태는 건드리지 않음
+                                });
+                                _updateAlarmSetting();
+                              }
                                   : null,
                             ),
                           ),
+
                           ListTile(
                             title: Text('채팅 알림', style: TextStyle(fontSize: 15)),
                             trailing: Switch(
                               value: _chatNotification,
+                              activeColor: switchActiveColor,
+                              inactiveThumbColor: switchInactiveThumbColor,
+                              inactiveTrackColor: switchInactiveTrackColor,
                               onChanged: _notificationsEnabled
-                                  ? (bool value) => setState(() => _chatNotification = value)
+                                  ? (bool value) {
+                                setState(() {
+                                  _chatNotification = value;
+                                  // 전체 알림이나 다른 알림 상태는 건드리지 않음
+                                });
+                                _updateAlarmSetting();
+                              }
                                   : null,
                             ),
                           ),
+
                         ],
                       ),
                     ),
@@ -473,7 +540,6 @@ class _OptionState extends State<Option> {
 
                   SizedBox(height: 20),
 
-                  // 로그아웃 카드 (담당과목 / 교무실 카드 스타일과 동일)
                   Card(
                     elevation: 2,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -493,8 +559,6 @@ class _OptionState extends State<Option> {
               ),
             ),
           ),
-
-          // 하단 내비게이션 바 유지
           Positioned(
             bottom: 0,
             left: 0,

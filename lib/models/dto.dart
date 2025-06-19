@@ -75,7 +75,14 @@ class TeacherDto {
       office: json['office'],
     );
   }
-
+  Map<String, dynamic> toJson() {
+    return {
+      'teacherid': teacherid,
+      'subject': subject,
+      'office': office,
+    };
+  }
+  
   TeacherDto copyWith({
     String? teacherid,
     String? subject,
@@ -87,13 +94,7 @@ class TeacherDto {
       office: office ?? this.office,
     );
   }
-    Map<String, dynamic> toJson() {
-      return {
-        'teacherid': teacherid,
-        'subject': subject,
-        'office': office,
-      };
-    }
+
   }
 
 
@@ -309,5 +310,14 @@ class AlarmSettingDto {
       chat: json['chat'],
       schedule: json['schedule'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userid': userid,
+      'alarm': alarm,
+      'chat': chat,
+      'schedule': schedule,
+    };
   }
 }
