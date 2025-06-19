@@ -77,6 +77,7 @@ class _HomeState extends State<Home> {
 
         final myId = Provider.of<UserProvider>(context, listen: false).user?.userid;
         print(myId);
+        final roomDate = decoded['data'][0];
         final RoomId = decoded['data'][0]['room']?['roomid'];
         final theyId = getTheyId(RoomId, myId!);
         final _unreadCount = decoded['unread'] ?? 0;
@@ -248,7 +249,11 @@ class _HomeState extends State<Home> {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => Chat()),
+                                MaterialPageRoute(builder: (context) => Chat(
+                                  roomId: room.roomid,
+                                  they: teacherName,
+                                ),
+                                ),
                               );
                             },
                             child: Container(
@@ -282,7 +287,8 @@ class _HomeState extends State<Home> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '${teacherName} 학생',
+                                          _user?.usertype == UserType.teacher ?
+                                          '${teacherName} 학생' : '${teacherName} 선생님',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 18,

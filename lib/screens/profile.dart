@@ -173,7 +173,8 @@ class Profile extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => Home(),
+                                    builder: (context) => Chat( roomId: roomId,
+                                      they: name),
                                   ),
                                 );
                               } else {
