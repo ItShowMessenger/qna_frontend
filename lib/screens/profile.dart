@@ -173,10 +173,9 @@ class Profile extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => Chat( roomId: roomId,
-                                      they: name),
+                                    builder: (context) => Chat(
                                   ),
-                                );
+                                ));
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text('채팅방 생성 실패 (${response.statusCode}) (${roomId})')),

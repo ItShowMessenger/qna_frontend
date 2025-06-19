@@ -250,8 +250,6 @@ class _HomeState extends State<Home> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) => Chat(
-                                  roomId: room.roomid,
-                                  they: teacherName,
                                 ),
                                 ),
                               );

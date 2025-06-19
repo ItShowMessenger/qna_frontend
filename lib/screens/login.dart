@@ -55,7 +55,7 @@ class Login extends StatelessWidget {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
         userProvider.setUser(userDto);
 
-        if (jsonResponse['message']=="회원가입 성공") {
+        if (jsonResponse['message']=="가입 성공") {
           await showDialog(
             context: context,
             builder: (context) {

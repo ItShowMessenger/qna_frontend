@@ -94,6 +94,9 @@ class _OptionState extends State<Option> {
 
         final userProvider = Provider.of<UserProvider>(context, listen: false);
         userProvider.setUser(userDto);
+        userProvider.setTeacher(teacherDto);
+        userProvider.setFaqs(faqList);
+        userProvider.setAlarmSetting(alarmSettingDto);
       } else {
         print('프로필 조회 실패: ${response.statusCode}');
       }
@@ -426,7 +429,7 @@ class _OptionState extends State<Option> {
                   ),
                   SizedBox(height: 30),
 
-                  if (isTeacher && _teacher != null) ...[
+                  if (isTeacher) ...[
                     GestureDetector(
                       onTap: _showEditTeacherInfoPopup,
                       child: Card(
@@ -447,19 +450,19 @@ class _OptionState extends State<Option> {
                       ),
                     ),
                     SizedBox(height: 20),
-                    Card(
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      child: ExpansionTile(
-                        title: Text('자주하는 질문', style: TextStyle(fontSize: 18)),
-                        children: _faqs
-                            .map((faq) => ListTile(
-                          title: Text(faq.question),
-                          subtitle: Text(faq.answer),
-                        ))
-                            .toList(),
-                      ),
-                    ),
+                    // Card(
+                    //   elevation: 2,
+                    //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    //   child: ExpansionTile(
+                    //     title: Text('자주하는 질문', style: TextStyle(fontSize: 18)),
+                    //     children: _faqs
+                    //         .map((faq) => ListTile(
+                    //       title: Text(faq.question),
+                    //       subtitle: Text(faq.answer),
+                    //     ))
+                    //         .toList(),
+                    //   ),
+                    // ),
                     SizedBox(height: 20),
                   ],
 
